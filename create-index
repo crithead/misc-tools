@@ -1,0 +1,137 @@
+#!/usr/bin/env python3
+# Create Index
+# Create an "index.html" file listing the files in a directory.
+
+import argparse
+import glob
+import os
+import re
+import stat
+
+# Html header
+# 0: Title
+header = """
+<html>
+<head>
+  <title>Index of {0}</title>{1}
+</head>
+<body>
+"""
+
+# Meta CSS
+# 0: CSS file name
+link_ss = '\n  <link rel="stylesheet" type="text/css" href="{0}">'
+
+table_begin = '<div>\n<table>\n'
+table_end = '</table>\n</div>\n'
+table_item = '<tr><td><a href="{0}">{0}</a></td></tr>\n'
+
+# 0: Title
+title = '<h1>.../{0}</h1>\n'
+# 0: file link
+item = '<a href="{0}">{0}</a><br/>\n'
+
+footer = """
+</body>
+</html>
+"""
+
+def remove_nonfiles(files):
+    """Filter out everything but files from a directory listing."""
+    #print("Filter Files")
+    for f in files:
+        mode = os.stat(f).st_mode
+        if stat.S_ISREG(mode) != 0:
+            files.remove(f)
+    return files
+
+def remove_index(files):
+    """Remove 'index.html' and 'index.css' from a directory listing."""
+    #print("Remove Index")
+    if files.count('index.html') > 0:
+        files.remove('index.html')
+    if files.count('index.css') > 0:
+        files.remove('index.css')
+    return files
+
+def remove_non_html(files):
+    """Remove all files that do not have the html extension from the directory
+    listing."""
+    #print("Remove Non-HTML")
+    for f in files:
+        if not re.match('.+\.html', f):
+            files.remove(f)
+    return files
+
+# Options:
+# --style-sheet=filename.css [alias -s]
+# --directory=directory-path (default: CWD) [alias -d]
+# --show-dots (show . and .. in listing)
+# --show-index (show index.html and index.css in listing)
+# --only-files (list only files, ignore directories, sym links, etc.)
+parser = argparse.ArgumentParser(
+        description='Create an index.html in a directory listing the files therein.',
+        epilog='And stuff ...')
+parser.add_argument('-d', '--directory', action='store',
+                    help='Directory to list (default: CWD)')
+parser.add_argument('-s', '--style-sheet', action='store',
+                    help='CSS to include in index.html')
+parser.add_argument('--show-dots', action='store_true', default=False, 
+                    help='Show . and .. in listing')
+parser.add_argument('--show-index', action='store_true', default=False, 
+                    help='Show index.html and index.css in listing')
+parser.add_argument('--only-files', action='store_true', default=False, 
+                    help='List only files. Ignore directories, symlinks, etc.' )
+parser.add_argument('--html-only', action='store_true', default=False, 
+                    help='List only HTML files.' )
+args = parser.parse_args()
+#print(args)
+
+if args.style_sheet == None:
+    link = '\n'
+else:
+    link = link_ss.format(args.style_sheet)
+
+if args.directory == None:
+    args.directory = os.getcwd()
+
+try:
+    os.chdir(args.directory)
+except:
+    print('Failed to change directory to :', args.directory)
+    sys.exit(1)
+
+indexfile = "index.html"
+dirname = os.path.basename(args.directory)
+
+try:
+    fout = open(indexfile, 'w')
+except IOError as e:
+    print(e)
+    sys.exit(1)
+
+files = glob.glob("*")
+if args.show_dots == True:
+    files.extend(glob.glob(".*"))
+files.sort()
+
+if args.html_only == True:
+    files = remove_non_html(files)
+elif args.only_files == True:
+    files = remove_nonfiles(files)
+
+if args.show_index == False:
+    files = remove_index(files)
+
+# Write the index file
+fout.write(header.format(dirname, link))
+fout.write(title.format(dirname))
+fout.write(table_begin)
+for fn in files:
+    fout.write(item.format(fn))
+fout.write(table_end)
+fout.write(footer)
+fout.close()
+
+# End
+
