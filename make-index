@@ -1,0 +1,110 @@
+#!/bin/sh
+# Run tclsh from user's PATH \
+exec tclsh "$0" -- "$@"
+
+set STYLE "
+<style type=\"text/css\">
+body {
+  color: black;
+  background-color: #cfcfcf;
+  font-size: large;
+}
+h1 {
+  font-weight: bold;
+  color: #cfcfff;
+  background-color: black;
+  text-align: center;
+  padding: 1em;
+}
+div {
+  border-width: 2px;
+  border-color: black;
+  border-style: solid;
+  border-radius: 3px;
+  background-color: #cfcfff;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  padding-left: 2em;
+  padding-right: 2em;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+</style>
+"
+
+# Print Help
+proc PrintHelp {} {
+    puts "create-index - Create an index.html file for the current directory."
+    puts ""
+}
+
+proc StartHtml {fout dirname} {
+    global STYLE
+    # need doctype here
+    puts $fout "<html>"
+    puts $fout "<head>"
+    puts $fout "<title>Directory Index - $dirname</title>"
+    puts $fout $STYLE
+    puts $fout "<head>"
+    puts $fout "<body>"
+    puts $fout "<h1>.../$dirname</h1>"
+    puts $fout "<div>"
+}
+
+proc PutItem {fout item} {
+    puts $fout "<a href=\"$item\">$item</a><br>"
+}
+
+proc EndHtml {fout} {
+    set date [clock format [clock seconds] -format "%Y-%m-%d %T"]
+    puts $fout "</div>"
+    puts $fout "<br>"
+    puts $fout "<em>$date</em>"
+    puts $fout "</body>"
+    puts $fout "</html>"
+}
+
+################################################################################
+# MAIN
+
+# process command line
+for {set i 0} {$i < $argc} {incr i} {
+    set arg [lindex $argv $i]
+    if { [string compare $arg "--help"] == 0 } {
+        PrintHelp
+        exit 0
+    }
+}
+
+set dirname [file tail $env(PWD)]
+
+# open output file (trunc if exists)
+if [catch {open "index.html" {WRONLY CREAT TRUNC}} fout] {
+    puts stderr "failed to open file: $output: $fout"
+    exit 1
+}
+
+StartHtml $fout $dirname
+
+# list the files in the currect directory (alphabetically)
+set files [lsort [glob *]]
+# Find 'index.html' and remove it from the list of files, 
+# but still print it first in the file listing
+set index_ix [lsearch -exact $files {index.html}]
+if {$index_ix >= 0} {
+    set files [lreplace $files $index_ix $index_ix]  
+    PutItem $fout {index.html}
+    puts $fout "<br>"
+}
+foreach name $files {
+    PutItem $fout $name
+}
+
+EndHtml $fout
+
+close $fout
+
+exit 0
+

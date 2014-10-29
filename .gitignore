@@ -52,3 +52,9 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Documentation
+*.1.html
+*.1.pdf
+*.1
+

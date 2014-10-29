@@ -1,0 +1,72 @@
+CREATE-INDEX(1)
+===============
+:doctype: manpage
+
+NAME
+----
+create-index - generate an index.html file for a directory
+
+make-index - generate an index.html file for the current directory
+
+SYNOPSIS
+--------
+*create-index* ['OPTIONS']
+
+*make-index*
+
+DESCRIPTION
+-----------
+Generate an HTML index file ion a directory for the files therein.
+
+The ``create'' version of the prpgrams has options wile the ``make'' version
+has none.
+
+OPTIONS
+-------
+
+*-h*, *--help*::
+    Print a summary of options and exit.
+
+*-d* 'DIRECTORY', --directory 'DIRECTORY'::
+    Directory to list (default: CWD)
+
+*-s* 'STYLE SHEET', *--style-sheet* 'STYLE_SHEET'::
+    CSS to include in index.html
+
+*--show-dots*::
+    Show . and .. in listing
+
+*--show-index*::
+    Show index.html and index.css in listing
+
+*--only-files*::
+    List only files. Ignore directories, symlinks, etc.
+
+*--html-only*::
+    List only HTML files.
+
+EXIT STATUS
+-----------
+*0*::
+    The program always returns 0.
+
+
+EXAMPLES
+--------
+
+Print a moderately helpful usage message.
+..............................................................................
+create-index --help
+..............................................................................
+
+BUGS
+----
+Unknown.
+
+// a2x: --doctype manpage
+// a2x: --format manpage
+// a2x: --no-xmllint
+// a2x: --dblatex-opts "-P latex.output.revhistory=0"
+// build command:
+//   a2x --doctype manpage --format manpage bases.1.txt
+
