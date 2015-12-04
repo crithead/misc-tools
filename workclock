@@ -1,0 +1,167 @@
+#!/bin/sh
+# the next line restarts using wish \
+exec wish "$0" "$@"
+
+# Delay between clock updates
+set DELAY  999
+
+# Time values (in seconds)
+set START_OF_DAY [clock scan {09:00:00}]
+set END_OF_DAY   [clock scan {17:00:00}]
+set MIDNIGHT     [clock scan {23:59:59}]
+set TARGET_TIME 0
+
+# Display States:
+#  0 = time                           black
+#  1 = countdown to 08:00             blue
+#  2 = countdown to 17:00             green
+#  3 = countup from 17:00 to 24:00    red
+set displayState -1
+set previousState -1
+
+
+wm title . {Countdown Clock}
+
+frame .buttonframe
+button .buttonframe.timebutton -text Time -command displayTime
+button .buttonframe.countdownbutton -text Countdown -command displayCountdown
+button .buttonframe.quitbutton -text Quit -command quitTheProgram
+
+#canvas .timeframe -width 1200 -height 900
+label .timeframe -width 1200 -height 900
+.timeframe config -justify center -font {-size 256}
+
+bind . <KeyPress-t> toggleDisplay
+bind . <KeyPress-q> quitTheProgram
+
+pack .buttonframe -side bottom
+pack .timeframe -side top
+
+pack .buttonframe.timebutton .buttonframe.countdownbutton .buttonframe.quitbutton -side left 
+
+proc printHelp {} {
+    puts ""
+    puts "workclock -- Display a countdown to quitting time."
+    puts "Key Commands:"
+    puts "    t    Toggle display between countdown and time of day."
+    puts "    q    Quit the program."
+    puts ""
+}
+
+proc setColors {state} {
+    # Color Hex values
+    set BLACK  [format "#%02x%02x%02x" 0 0 0]
+    set BLUE   [format "#%02x%02x%02x" 0 0 128]
+    set GREEN  [format "#%02x%02x%02x" 0 128 0]
+    set RED    [format "#%02x%02x%02x" 255 0 0]
+    set WHITE  [format "#%02x%02x%02x" 255 255 255]
+    set YELLOW [format "#%02x%02x%02x" 255 255 0]
+
+    switch $state {
+    0 { set fg $WHITE;  set bg $BLACK }
+    1 { set fg $YELLOW; set bg $BLUE }
+    2 { set fg $YELLOW; set bg $GREEN }
+    3 { set fg $YELLOW; set bg $RED }
+    }
+    .timeframe configure -foreground $fg -background $bg
+}
+
+proc getState {} {
+    global displayState
+    global previousState
+    global START_OF_DAY
+    global END_OF_DAY
+    global MIDNIGHT
+    global TARGET_TIME
+
+    set previousState $displayState
+    set t [clock seconds]
+    if {$displayState == 0} {
+        # Do nothing .. keep displayState of 0
+    } elseif {$t < $START_OF_DAY} {
+        set displayState 1
+        set TARGET_TIME $START_OF_DAY
+    } elseif {$t < $END_OF_DAY} {
+        set displayState 2
+        set TARGET_TIME $END_OF_DAY
+    } elseif {$t < $MIDNIGHT} {
+        set displayState 3
+        set TARGET_TIME $MIDNIGHT
+    } else {
+        set displayState 1
+        set TARGET_TIME $START_OF_DAY
+    }
+    if {$displayState !=  $previousState} {
+        setColors $displayState
+        set START_OF_DAY [clock scan {09:00:00}]
+        set END_OF_DAY [clock scan {17:00:00}]
+        set MIDNIGHT [clock scan {23:59:59}]
+    }
+
+    return $displayState
+}
+
+proc setTime {t} {
+    .timeframe configure -text $t
+}
+
+proc getTime {} {
+    return [clock format [clock seconds] -format "%H:%M:%S"]
+}
+
+proc getTimeDiff {target} {
+    set t0 [clock scan $target]
+    set t1 [clock seconds]
+    if {$t0 > $t1} {
+        set diff [expr ($t0 - $t1)]
+    } else {
+        set diff [expr ($t1 - $t0)]
+    }
+    return [clock format $diff -format "%H:%M:%S"]
+}
+
+proc displayCountdown {} {
+    global displayState
+    set displayState -1
+}
+
+proc displayTime {} {
+    global displayState
+    set displayState 0
+}
+
+proc quitTheProgram {} {
+    exit 0
+}
+
+proc toggleDisplay {} {
+    global displayState
+    if {$displayState == 0} {
+        set displayState -1
+    } else {
+        set displayState 0
+    }
+}
+
+proc updateTime {} {
+    global DELAY
+    global TARGET_TIME
+    after $DELAY updateTime
+    set state [getState]
+    if {$state == 0} {
+        setTime [getTime]
+    } else {
+        setTime [getTimeDiff $TARGET_TIME]
+    }
+}
+
+
+## main ##
+getState
+updateTime
+printHelp
+
+#############################################################################
+# TODO
+# 1. Add option to display seconds (or not)
+#
