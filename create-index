@@ -8,60 +8,157 @@ import os
 import re
 import stat
 
+INDEXFILE = 'index.html'
+
+CSSFILE = 'index.css'
+
+CSSDATA = """
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  color: black;
+  background: white;
+}
+body {
+  margin: 1em 10% 1em 10%;
+}
+h1 {
+  font-family: Georgia, Palatino, Times, serif;
+  font-size: 240%;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+  border-bottom: 2px solid gray;
+}
+a {
+  color: navy;
+  font-weight: bold;
+  text-decoration: none;
+}
+a:visited {
+  font-weight: normal;
+}
+a:hover {
+  background: silver;
+  font-weight: normal;
+}
+div.c1of1 {
+  position: absolute;
+  left: 15%
+  padding: 1em;
+}
+div.column1 {
+  position: absolute;
+  left: 15%
+  padding: 1em;
+}
+div.column2of2 {
+  position: absolute;
+  left: 55%;
+  padding: 1em;
+}
+div.footer {
+  color: silver;
+  text-align: right;
+  font-size: small;
+  font-style: italic;
+  border-top: 2px solid gray;
+  padding-top: 0.5em;
+  margin-top: 4em;
+}
+hr {
+  border: 2px solid gray;
+}
+pre {
+  padding: 0;
+  margin: 0;
+}
+"""
+
+MANUAL_TEXT = """\
+Manual for 'create-index'
+* ToDo: Write a manual!
+- Contains a default CSS file text
+- Default CSS file name is 'index.css'
+- Write the built-in CSS file with --create-style-sheet
+- Can only handle 1 or tow columns
+
+"""
+
 # Html header
 # 0: Title
-header = """
+HEADER = """\
 <html>
 <head>
   <title>Index of {0}</title>{1}
 </head>
 <body>
+
 """
 
 # Meta CSS
 # 0: CSS file name
-link_ss = '\n  <link rel="stylesheet" type="text/css" href="{0}">'
+LINK_SS = '\n  <link rel="stylesheet" type="text/css" href="{0}">'
 
-table_begin = '<div>\n<table>\n'
-table_end = '</table>\n</div>\n'
-table_item = '<tr><td><a href="{0}">{0}</a></td></tr>\n'
+LIST_BEGIN = '<div class="column1">\n'
+LIST_MIDPOINT = '</div>\n<div class="column2of2">\n'
+LIST_END = '</div>\n'
 
 # 0: Title
-title = '<h1>.../{0}</h1>\n'
+TITLE = '<h1>{0}</h1>\n'
 # 0: file link
-item = '<a href="{0}">{0}</a><br/>\n'
+ITEM = '<a href="{0}">{0}</a><br/>\n'
 
-footer = """
+FOOTER = """
 </body>
 </html>
 """
 
+messages_on = False
+
+def msg(*msgs):
+    if messages_on:
+        for m in msgs:
+            print(m, end=' ')
+        print()
+
+def print_usage():
+    print(MANUAL_TEXT)
+
+
 def remove_nonfiles(files):
     """Filter out everything but files from a directory listing."""
-    #print("Filter Files")
+    msg("Filter Files")
     for f in files:
         mode = os.stat(f).st_mode
         if stat.S_ISREG(mode) != 0:
             files.remove(f)
     return files
 
+
 def remove_index(files):
     """Remove 'index.html' and 'index.css' from a directory listing."""
-    #print("Remove Index")
+    msg("Remove Index")
     if files.count('index.html') > 0:
         files.remove('index.html')
     if files.count('index.css') > 0:
         files.remove('index.css')
     return files
 
+
 def remove_non_html(files):
     """Remove all files that do not have the html extension from the directory
     listing."""
-    #print("Remove Non-HTML")
+    msg("Remove Non-HTML")
     for f in files:
         if not re.match('.+\.html', f):
             files.remove(f)
     return files
+
+
+def write_style_sheet(cssfile):
+    with open( cssfile, 'w') as f:
+        f.write(CSSDATA)
+
 
 # Options:
 # --style-sheet=filename.css [alias -s]
@@ -74,26 +171,53 @@ parser = argparse.ArgumentParser(
         epilog='And stuff ...')
 parser.add_argument('-d', '--directory', action='store',
                     help='Directory to list (default: CWD)')
-parser.add_argument('-s', '--style-sheet', action='store',
+parser.add_argument('-s', '--style-sheet', action='store', default=None,
                     help='CSS to include in index.html')
-parser.add_argument('--show-dots', action='store_true', default=False, 
+parser.add_argument('--create-style-sheet', action='store_true', default=False,
+                    help='Create a defualt style sheet')
+parser.add_argument('-c', '--columns', action='store', type=int, default=2,
+                    help='Number of columns (default 2)')
+parser.add_argument('-t', '--title', action='store', default=None,
+                    help='Page title')
+parser.add_argument('--show-dots', action='store_true', default=False,
                     help='Show . and .. in listing')
-parser.add_argument('--show-index', action='store_true', default=False, 
+parser.add_argument('--show-index', action='store_true', default=False,
                     help='Show index.html and index.css in listing')
-parser.add_argument('--only-files', action='store_true', default=False, 
+parser.add_argument('--only-files', action='store_true', default=False,
                     help='List only files. Ignore directories, symlinks, etc.' )
-parser.add_argument('--html-only', action='store_true', default=False, 
+parser.add_argument('--html-only', action='store_true', default=False,
                     help='List only HTML files.' )
+parser.add_argument('-u', '--usage', action='store_true', default=False,
+                    help='Print the manual.' )
+parser.add_argument('-v', '--verbose', action='store_true', default=False,
+                    help='Print processing messages' )
 args = parser.parse_args()
-#print(args)
+
+if args.verbose:
+    messages_on = True
+    print(args)
+
+if args.usage:
+    print_usage()
+    exit(0)
+
+if args.columns < 1 or args.columns > 2:
+    raise ValueError('Only 1 or 2 columns supported')
+else:
+    msg('Output in', args.columns, 'columns')
+
+if args.create_style_sheet:
+    msg('Writing style sheet (', CSSFILE, ')')
+    write_style_sheet(CSSFILE)
 
 if args.style_sheet == None:
-    link = '\n'
+    link = LINK_SS.format(CSSFILE)
 else:
-    link = link_ss.format(args.style_sheet)
+    link = LINK_SS.format(args.style_sheet)
 
 if args.directory == None:
     args.directory = os.getcwd()
+msg('Directory is', args.directory)
 
 try:
     os.chdir(args.directory)
@@ -101,14 +225,10 @@ except:
     print('Failed to change directory to :', args.directory)
     sys.exit(1)
 
-indexfile = "index.html"
-dirname = os.path.basename(args.directory)
-
-try:
-    fout = open(indexfile, 'w')
-except IOError as e:
-    print(e)
-    sys.exit(1)
+if args.title:
+    page_title = args.title
+else:
+    page_title = '.../' + os.path.basename(args.directory)
 
 files = glob.glob("*")
 if args.show_dots == True:
@@ -124,14 +244,26 @@ if args.show_index == False:
     files = remove_index(files)
 
 # Write the index file
-fout.write(header.format(dirname, link))
-fout.write(title.format(dirname))
-fout.write(table_begin)
-for fn in files:
-    fout.write(item.format(fn))
-fout.write(table_end)
-fout.write(footer)
-fout.close()
+try:
+    if args.columns == 2:
+        midpoint = -1 + len(files) / 2
+    else:
+        midpoint = 2 * len(files)
+
+    with open(INDEXFILE, 'w') as f:
+        f.write(HEADER.format(page_title, link))
+        f.write(TITLE.format(page_title))
+        f.write(LIST_BEGIN)
+        for i in range(len(files)):
+            f.write(ITEM.format(files[i]))
+            if i == midpoint:
+                f.write(LIST_MIDPOINT)
+        f.write(LIST_END)
+        f.write(FOOTER)
+
+except IOError as e:
+    print(e)
+    sys.exit(1)
 
 # End
 
