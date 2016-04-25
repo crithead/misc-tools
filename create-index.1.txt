@@ -21,11 +21,24 @@ Generate an HTML index file ion a directory for the files therein.
 The ``create'' version of the prpgrams has options wile the ``make'' version
 has none.
 
+MANUAL_TEXT = """\
+Manual for 'create-index'
+* ToDo: Write a manual!
+- Contains a default CSS file text
+- Default CSS file name is 'index.css'
+- Write the built-in CSS file with --create-style-sheet
+- Can only handle 1 or 2 columns
+
+"""
+
 OPTIONS
 -------
 
 *-h*, *--help*::
     Print a summary of options and exit.
+
+*-c* 'NUMCOLS', *--columns* 'NUM_COLS'::
+    Format output in 'NUM_COLS' columns. (Where NUM_COLS is 1 or 2)
 
 *-d* 'DIRECTORY', --directory 'DIRECTORY'::
     Directory to list (default: CWD)
@@ -33,22 +46,44 @@ OPTIONS
 *-s* 'STYLE SHEET', *--style-sheet* 'STYLE_SHEET'::
     CSS to include in index.html
 
+*-t* 'TITLE', *--title* 'TITLE'::
+    Set the page title to 'TITLE'.  The default is to use the directory name.
+
+*-v*, *--verbose* ::
+    Enable processing messages.
+
+*--create-style-sheet*::
+    Writes a default style sheet to the output directory.
+
+*--html-only*::
+    List only HTML files.
+
+*--only-files*::
+    List only files. Ignore directories, symlinks, etc.
+
 *--show-dots*::
     Show . and .. in listing
 
 *--show-index*::
     Show index.html and index.css in listing
 
-*--only-files*::
-    List only files. Ignore directories, symlinks, etc.
-
-*--html-only*::
-    List only HTML files.
 
 EXIT STATUS
 -----------
+Any non-zero return status indicates an index file was not produced.
+
 *0*::
-    The program always returns 0.
+    The program encountered no errors and produced an index file.
+
+*1*::
+    The program printed the help message.
+
+*2*::
+    The specified directory cannot be opened.
+
+*3*::
+    I/O Error.
+
 
 
 EXAMPLES
@@ -61,12 +96,12 @@ create-index --help
 
 BUGS
 ----
-Unknown.
+Various.
 
 // a2x: --doctype manpage
 // a2x: --format manpage
 // a2x: --no-xmllint
 // a2x: --dblatex-opts "-P latex.output.revhistory=0"
 // build command:
-//   a2x --doctype manpage --format manpage bases.1.txt
+//   a2x --doctype manpage --format manpage create-index.1.txt
 
