@@ -55,6 +55,9 @@ docs/_build/
 # PyBuilder
 target/
 
+# Editor crud
+*.swp
+
 # Documentation
 *.1.html
 *.1.pdf
