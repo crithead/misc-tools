@@ -3,10 +3,10 @@
 # Create an "index.html" file listing the files in a directory.
 
 import argparse
-import glob
 import os
-import re
 import stat
+from glob import glob
+from datetime import date
 
 INDEXFILE = 'index.html'
 
@@ -41,7 +41,7 @@ a:hover {
 }
 div.column1 {
   position: absolute;
-  left: 15%
+  left: 15%;
   padding: 1em;
 }
 div.column2of2 {
@@ -60,10 +60,6 @@ div.footer {
 }
 hr {
   border: 2px solid gray;
-}
-pre {
-  padding: 0;
-  margin: 0;
 }
 """
 
@@ -96,6 +92,18 @@ FOOTER = """
 </html>
 """
 
+# TODO Fix stylesheet footer positioning
+#FOOTER = """
+#<div class="footer">
+#  Last updated {0}
+#</div>
+#</body>
+#</html>
+#"""
+
+# Today's date as a string
+DATE = date.today().isoformat()
+
 messages_on = False
 
 def msg(*msgs):
@@ -108,11 +116,12 @@ def msg(*msgs):
 def remove_nonfiles(files):
     """Filter out everything but files from a directory listing."""
     msg("Filter Files")
+    onlyfiles = []
     for f in files:
         mode = os.stat(f).st_mode
-        if stat.S_ISREG(mode) != 0:
-            files.remove(f)
-    return files
+        if stat.S_ISREG(mode) == 0:
+            onlyfiles.append(f)
+    return onlyfiles
 
 
 def remove_index(files):
@@ -129,13 +138,15 @@ def remove_non_html(files):
     """Remove all files that do not have the html extension from the directory
     listing."""
     msg("Remove Non-HTML")
+    htmlfiles = []
     for f in files:
-        if not re.match('.+\.html', f):
-            files.remove(f)
-    return files
+        if f.endswith('.html'):
+            htmlfiles.append(f)
+    return htmlfiles
 
 
 def write_style_sheet(cssfile):
+    """Write the built-in CSS to the given file."""
     with open( cssfile, 'w') as f:
         f.write(CSSDATA)
 
@@ -205,18 +216,24 @@ if args.title:
 else:
     page_title = '.../' + os.path.basename(args.directory)
 
-files = glob.glob("*")
-if args.show_dots == True:
-    files.extend(glob.glob(".*"))
+files = glob("*")
+if args.show_dots:
+    files.extend(glob(".*"))
 files.sort()
+msg(files)
 
-if args.html_only == True:
-    files = remove_non_html(files)
-elif args.only_files == True:
+if args.only_files:
     files = remove_nonfiles(files)
+    msg('only-files', files)
 
-if args.show_index == False:
+if args.html_only:
+    files = remove_non_html(files)
+    msg('html-only', files)
+
+if not args.show_index:
     files = remove_index(files)
+
+msg(files)
 
 # Write the index file
 try:
@@ -234,6 +251,7 @@ try:
             if i == midpoint:
                 f.write(LIST_MIDPOINT)
         f.write(LIST_END)
+        #f.write(FOOTER.format(DATE))
         f.write(FOOTER)
 
 except IOError as e:
