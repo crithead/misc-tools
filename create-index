@@ -17,8 +17,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   color: black;
   background: white;
-}
-body {
   margin: 1em 10% 1em 10%;
 }
 h1 {
@@ -40,11 +38,6 @@ a:visited {
 a:hover {
   background: silver;
   font-weight: normal;
-}
-div.c1of1 {
-  position: absolute;
-  left: 15%
-  padding: 1em;
 }
 div.column1 {
   position: absolute;
@@ -110,9 +103,6 @@ def msg(*msgs):
         for m in msgs:
             print(m, end=' ')
         print()
-
-def print_usage():
-    print(MANUAL_TEXT)
 
 
 def remove_nonfiles(files):
@@ -185,10 +175,6 @@ if args.verbose:
     messages_on = True
     print(args)
 
-if args.usage:
-    print_usage()
-    exit(1)
-
 if args.columns < 1 or args.columns > 2:
     raise ValueError('Only 1 or 2 columns supported')
 else:
@@ -235,7 +221,7 @@ if args.show_index == False:
 # Write the index file
 try:
     if args.columns == 2:
-        midpoint = -1 + len(files) / 2
+        midpoint = -1 + int((len(files) + 1) / 2)
     else:
         midpoint = 2 * len(files)
 
