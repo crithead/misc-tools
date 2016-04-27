@@ -6,20 +6,20 @@ NAME
 ----
 create-index - generate an index.html file for a directory
 
-make-index - generate an index.html file for the current directory
 
 SYNOPSIS
 --------
 *create-index* ['OPTIONS']
 
-*make-index*
-
 DESCRIPTION
 -----------
-Generate an HTML index file ion a directory for the files therein.
+Generate an HTML index file in a directory for the files therein.
 
 The ``create'' version of the prpgrams has options wile the ``make'' version
 has none.
+
+The '--create-style-sheet' writes the default CSS file to the specified
+directory.
 
 MANUAL_TEXT = """\
 Manual for 'create-index'
@@ -38,13 +38,15 @@ OPTIONS
     Print a summary of options and exit.
 
 *-c* 'NUMCOLS', *--columns* 'NUM_COLS'::
-    Format output in 'NUM_COLS' columns. (Where NUM_COLS is 1 or 2)
+    Format output in 'NUM_COLS' columns (currently limited to 1 or 2).  The
+    default is 2.
 
-*-d* 'DIRECTORY', --directory 'DIRECTORY'::
+*-d* 'DIRECTORY', *--directory* 'DIRECTORY'::
     Directory to list (default: CWD)
 
 *-s* 'STYLE SHEET', *--style-sheet* 'STYLE_SHEET'::
-    CSS to include in index.html
+    The name of the CSS file to include in the output 'index.html' file.  The
+    default is 'index.css'.
 
 *-t* 'TITLE', *--title* 'TITLE'::
     Set the page title to 'TITLE'.  The default is to use the directory name.
@@ -94,9 +96,23 @@ Print a moderately helpful usage message.
 create-index --help
 ..............................................................................
 
+Create an index file and a CSS file of the HTML files in the current directory.
+..............................................................................
+create-index --create-style-sheet --html-only --title "Index of This Directory"
+..............................................................................
+
+
 BUGS
 ----
 Various.
+
+
+ALTERNATES
+----------
+make-index - generate an index.html file for the current directory
+
+This is a precursor to 'create-index' that was written in Tcl.  It does
+basically the same thing, but has no options.
 
 // a2x: --doctype manpage
 // a2x: --format manpage
