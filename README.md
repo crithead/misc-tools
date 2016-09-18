@@ -23,6 +23,10 @@ make-index
 ----------
 Generates an ''index.html'' in the current directory.
 
+mp3convert
+----------
+Copy (mp3) audio files to mp3 with a specified bit rate.
+
 workclock
 ---------
 Full screen clock that displays the time or counts down to quitting time.
