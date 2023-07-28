@@ -1,0 +1,5 @@
+set title 'Coin Flip'
+set term png size 800, 600
+set output "abcd.png"
+#plot for [col=1:4] "abcd.data" using 0:col with lines
+plot for [col=1:4] "abcd.data" with lines

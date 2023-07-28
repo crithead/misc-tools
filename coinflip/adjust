@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+"""
+Make adjustments to coinflip output data in place.
+-a, --about         Print information about the data
+-c N, --ceiling N   Set the maximum value, move all points down
+-f N, --floor N     Set the minimum value, move all data up
+-o N, --offset N    Add to all points, after floor/ceiling
+"""
+import argparse
+
+def get_options():
+    parser = argparse.ArgumentParser(
+        description='Adjust coinflip data files.',
+        epilog='* If both ceiling and floor are specified, the data is compressed')
+    parser.add_argument('-a', '--about', action='store_true', default=False,
+        help='print information about the data')
+    parser.add_argument('-c', '--ceiling', action='store', default=None,
+        type=int, help='set maximum value')
+    parser.add_argument('-f', '--floor', action='store', default=None,
+        type=int, help='set minimum value')
+    parser.add_argument('-o', '--offset', action='store', default=0,
+        type=int, help='move points by this amount')
+    parser.add_argument('datafiles', nargs='+',
+                    help='coinflip data files to adjust')
+    return parser.parse_args()
+
+
+def find_min_avg_max(data):
+    minimum = 2147483647
+    maximum = -2147483647
+    total_value = 0
+    for value in data:
+        if value[1] < minimum:
+            minimum = value[1]
+        if value[1] > maximum:
+            maximum = value[1]
+        total_value += value[1]
+    average = total_value / len(data)
+    return minimum, average, maximum
+
+
+def make_adjustments(opts, data):
+    if opts.ceiling is not None or opts.floor is not None:
+        minimum, average, maximum = find_min_avg_max(data)
+    if opts.ceiling is not None and opts.floor is not None:
+        if opts.floor >= opts.ceiling:
+            raise ValueError('Floor must be less than ceiling')
+        # Compress/expand the data into [floor, ceiling]
+        spread = maximum - minimum + 0
+        span = opts.ceiling - opts.floor + 0
+        for i, p in enumerate(data):
+            distance = p[1] - minimum
+            f = span * (distance / spread)
+            data[i] = p[0], opts.floor + int(f + 0.5)
+        return
+    offset = opts.offset
+    if opts.ceiling is not None:
+        if maximum > opts.ceiling:
+            offset += opts.ceiling - maximum
+    if opts.floor is not None:
+        if minimum < opts.floor:
+            offset += opts.floor - minimum
+    for i, p in enumerate(data):
+        data[i] = p[0], p[1] + offset
+
+
+def print_info(header, data):
+    if header is not None:
+        print('Header: Yes')
+    else:
+        print('Header: No')
+    if data[0][0] is not None:
+        print('Count: Yes')
+    else:
+        print('Count: No')
+
+    minimum, average, maximum = find_min_avg_max(data)
+    print('Minimum:', minimum)
+    print('Average: {:.1f}'.format(average))
+    print('Maximum:', maximum)
+    print('Spread:', maximum - minimum + 1)
+
+
+def read_data(datafile):
+    data = list()
+    header = None
+    with open(datafile, 'r') as f:
+        for line in f:
+            fields = line.split('\t')
+            if len(fields) == 1:
+                try:
+                    value = int(fields[0])
+                    data.append((None, value))
+                except ValueError:
+                    if header is None:
+                        header = line
+            else:
+                try:
+                    count = int(fields[0])
+                    value = int(fields[1])
+                    data.append((count, value))
+                except ValueError:
+                    if header is None:
+                        header = line
+    return header, data
+
+
+def write_data(datafile, header, data):
+    with open(datafile, 'w') as f:
+        if header is not None:
+            print(header, file=f)
+        for item in data:
+            if item[0] is None:
+                print(item[1], file=f)
+            else:
+                print(item[0], item[1], sep='\t', file=f)
+
+
+def main(opts):
+    for datafile in opts.datafiles:
+        header, data = read_data(datafile)
+        if opts.about:
+            print_info(header, data)
+        else:
+            make_adjustments(opts, data)
+            write_data(datafile, header, data)
+
+
+if __name__ == '__main__':
+    exit_code = 1
+    try:
+        opts = get_options()
+        main(opts)
+        exit_code = 0
+    except Exception as e:
+        #print(e)
+        import traceback
+        traceback.print_exc()
+    finally:
+        exit(exit_code)
+

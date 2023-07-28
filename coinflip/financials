@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+#
+# Generate a financial plot from a stream of coinflip data.
+#
+# input:
+#   count\tvalue
+#
+# output:
+#   count\topen\tmin\tmax\tclose
+#
+import sys
+import random
+
+TRADING_DAY = 390           # minutes
+UPDATE_RESOLUTION = 5       # minutes between samples
+INTERDAY_GAP = 12           # samples between days
+
+SAMPLES_PER_DAY = int(TRADING_DAY / UPDATE_RESOLUTION)
+
+DAILY_SAMPLE = SAMPLES_PER_DAY + INTERDAY_GAP
+
+#
+# At one sample per 5 minutes and 2 hour (120 min) gap between days,
+# one year (52 weeks * 5 days/week - 10 holidays) is 250 days,
+# or 22,500 samples
+#
+# At one sample per 1 minute, one year is 112,500 samples.
+#
+
+def find_offset(data):
+    # data is a list of (int, int)
+    assert isinstance(data, list)
+    min_value = sys.maxsize
+    for i, x in data:
+        if x < min_value:
+            min_value = x
+    if min_value < 10:
+        min_value = 10 - min_value
+    return min_value
+
+
+def next_day(data, begin, end, offset=0):
+    # All data elements have "int: index, int: value"
+    # index is discarded here
+    vopen = data[begin][1]
+    vclose = data[end][1]
+    vlow = sys.maxsize
+    vhigh = -sys.maxsize
+    for i in range(begin, end):
+        v = data[i][1]
+        if v > vhigh:
+            vhigh = v
+        if v < vlow:
+            vlow = v
+    # return tuple of strings
+    return (str(offset + vopen), str(offset + vlow), str(offset + vhigh),
+            str(offset + vclose))
+
+
+def read_data(filename):
+    """ read_data( filename ) -> list of (count,value)
+        Converts all input values to integers.
+    """
+    data = list()
+    with open(filename, 'r') as f:
+        linenum = 0
+        for line in f:
+            linenum += 1
+            line = line.strip()
+            fields = line.split('\t')
+            if len(fields) == 1:
+                value = linenum, int(fields[0])
+            elif len(fields) == 2:
+                value = int(fields[0]), int(fields[1])
+            else:
+                print('ERROR: too many fields per line (%d)' % len(fields),
+                        file=sys.stderr)
+                continue
+            data.append( value )
+    return data
+
+
+def write_data(filename, data):
+    """write_data(filename, data) -> None"""
+    with open(filename, 'w') as f:
+        # add index back
+        linenum = 0
+        for line in data:
+            linenum += 1
+            print(linenum, '\t'.join(line), sep='\t', file=f)
+
+
+def main(args):
+    print('DAILY SAMPLE', DAILY_SAMPLE)
+
+    for input_filename in args:
+        print('Calculating daily financials for', input_filename)
+        input_index = 0
+        data = read_data(input_filename)
+        offset = find_offset(data)
+        output_filename = 'financials_' + input_filename
+        output_data = list()
+        while len(data) - input_index >= DAILY_SAMPLE:
+            daily = next_day(data, input_index, input_index + SAMPLES_PER_DAY,
+                    offset)
+            output_data.append(daily)
+            input_index += DAILY_SAMPLE
+        print(len(output_data), 'days')
+        write_data(output_filename, output_data)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])
+

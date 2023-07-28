@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# Generate the data files with column header and a count column.
+# $ ./cf -c -t -n NNN a b c d
+#
+# Then plot with
+# $ gnuplot abcd.plt
+#
+join a.data b.data > ab.data
+join c.data d.data > cd.data
+join ab.data cd.data > abcd.data
+rm -f ab.data cd.data
+
