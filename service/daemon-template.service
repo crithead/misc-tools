@@ -1,0 +1,16 @@
+[Unit]
+Description=Daemon Template
+After=syslog.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=forking
+PIDFile=/run/templated.pid
+Restart=always
+RestartSec=1
+StartLimitAction=reboot
+User=user
+ExecStart=/usr/bin/templated
+
+[Install]
+WantedBy=multi-user.target
