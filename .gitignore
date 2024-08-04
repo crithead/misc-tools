@@ -137,3 +137,6 @@ cpp/trajectory
 cpp/vector
 cpp/wordfreq
 cpp/wordfreq2
+
+# service
+service/templated
