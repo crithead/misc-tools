@@ -8,9 +8,14 @@
 #include <errno.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include <syslog.h>
 #include <unistd.h>
+
+#include "message.h"
+#include "options.h"
+#include "service.h"
 
 #define PID_FILE "/run/templated.pid"
 
@@ -27,9 +32,11 @@ enum {
 };
 
 static void dump_stats(void);
+static void print_usage(void);
 static void reload(void);
 static void signal_handler(int);
-static void write_pid(const char *);
+static void write_pid_file(const char *);
+static void remove_pid_file(const char *);
 
 static int current_request = SVC_NONE;
 
@@ -45,6 +52,14 @@ static int current_request = SVC_NONE;
  */
 int main( int argc, char **argv)
 {
+    struct options opts;
+    init_options(argc, argv, &opts);
+
+    if (opts.help) {
+        print_usage();
+        return 0;
+    }
+
     /* Daemonize */
     if (daemon(0, 0) < 0) {
         openlog("SVC", LOG_PID, LOG_USER);
@@ -53,9 +68,9 @@ int main( int argc, char **argv)
         return 1;
     }
 
-    write_pid(PID_FILE);
-
     openlog("SVC", LOG_PID, LOG_USER);
+    write_pid_file(PID_FILE);
+
 
     /* Install SIG handlers for INT, USR1, USR1 */
 #if 0
@@ -72,17 +87,22 @@ int main( int argc, char **argv)
 #endif
 
     if (sigaction(SIGINT, &sigact, NULL) < 0) {
-        syslog(LOG_CRIT, "Sigaction: %s", strerror(errno));
+        syslog(LOG_EMERG, "Sigaction: %s", strerror(errno));
+        return 1;
+    }
+
+    if (sigaction(SIGHUP, &sigact, NULL) < 0) {
+        syslog(LOG_EMERG, "Sigaction: %s", strerror(errno));
         return 1;
     }
 
     if (sigaction(SIGUSR1, &sigact, NULL) < 0) {
-        syslog(LOG_CRIT, "Sigaction: %s", strerror(errno));
+        syslog(LOG_EMERG, "Sigaction: %s", strerror(errno));
         return 1;
     }
 
     if (sigaction(SIGUSR2, &sigact, NULL) < 0) {
-        syslog(LOG_CRIT, "Sigaction: %s", strerror(errno));
+        syslog(LOG_EMERG, "Sigaction: %s", strerror(errno));
         return 1;
     }
 
@@ -113,6 +133,7 @@ int main( int argc, char **argv)
         }
     }
 
+    remove_pid_file(PID_FILE);
     syslog(LOG_NOTICE, "Offline");
     closelog();
 
@@ -125,6 +146,27 @@ int main( int argc, char **argv)
 static void dump_stats(void)
 {
     syslog(LOG_INFO, "Stats");
+}
+
+static void print_usage(void)
+{
+    static const char USAGE[] = "\n\
+    templated [ -hqv ] [ -c FILE ] [ --config-file FILE ] [ --help ]\n\
+        [ --quiet ] [ --verbose ]\n\
+\n\
+    OPTIONS\n\
+    -h, --help      Print usage message and exit\n\
+    -q, --quiet     Only log warnings and above\n\
+    -v, --verbose   Log everything (Debug and above)\n\
+\n\
+    SIGNALS\n\
+    USR1    Dump stats to log\n\
+    USR2    Same as USR1\n\
+    HUP     Reload configuration file\n\
+    INT     Shutdown\n\
+\n";
+
+    puts(USAGE);
 }
 
 /**
@@ -158,6 +200,18 @@ static void signal_handler(int sig)
     }
 }
 
+/**
+ * Remove this process's PID file.
+ * @param pid_file The path of the PID file.
+ */
+static void remove_pid_file(const char *pid_file)
+{
+    if (unlink(pid_file) < 0) {
+        syslog(LOG_ERR, "Failed to unlink PID file (%s): %s", pid_file, strerror(errno));
+    } else {
+        syslog(LOG_DEBUG, "Unlinked PID file (%s)", pid_file);
+    }
+}
 
 /**
  * Write this process's PID to a file.
@@ -166,14 +220,13 @@ static void signal_handler(int sig)
 static void write_pid_file(const char *pid_file)
 {
     pid_t pid = getpid();
-    int fd = open(pid_file, O_CREAT | O_WRONLY | O_TRUNC,
-                  S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-    if (fd > 0) {
-        fprintf(fd, "%d", pid);
-        close(fd);
+    FILE *fp = fopen(pid_file, "w");
+    if (fp != NULL) {
+        fprintf(fp, "%d", pid);
+        fclose(fp);
         syslog(LOG_DEBUG, "PID FILE = %s", pid_file);
     } else {
-        syslog(LOG_ERR, "Failed to write PID file");
+        syslog(LOG_ERR, "Failed to write PID file: %s", strerror(errno));
     }
 }
 

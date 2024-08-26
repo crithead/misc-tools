@@ -1,8 +1,9 @@
 /**
  * Option processing for the daemon template.
  */
-#ifndef DAEMON_TEMPLATE_OPTIONS_H
-#define DAEMON_TEMPLATE_OPTIONS_H
+#pragma once
+
+#include <stdbool.h>
 
 /** Default file name of the configuration file. */
 #define DEFAULT_CONFIG_FILE "/etc/templated.conf"
@@ -11,6 +12,8 @@
  * Program runtime options.
  */
 struct options {
+    /** Print usage information and exit. */
+    bool help;
     /** Set log level to WARNING. Overrides verbose. */
     bool quiet;
     /** Set log level to debug. */
@@ -28,6 +31,4 @@ struct options {
  * @retval 1 Failure
  */
 extern int init_options(int argc, char **argv, struct options *opts);
-
-#endif // DAEMON_TEMPLATE_OPTIONS_H
 

@@ -1,11 +1,19 @@
-EXE = templated
-CFLAGS += -Wall -Werror -std=c11
+EXEC = templated
+CFLAGS += -Wall -Werror -std=c17
 
-$(EXE): service.c options.c
-	$(CC) $(CFLAGS) -o $@ $? -lc
+SOURCES := service.c
+SOURCES += message.c
+SOURCES += options.c
+
+OBJECTS := $(SOURCES:.c=.o)
+
+$(EXEC): $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $^ -lc
+
+%.o: %.h %.c
 
 clean:
-	@rm -f $(EXE)
+	@rm -f $(EXEC) $(OBJECTS)
 
 .PHONY: all clean
 
