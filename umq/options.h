@@ -9,7 +9,7 @@
 #define DEFAULT_CONFIG_FILE "unixmq.conf"
 
 /** Default name of the server socket file. */
-#define DEFAULT_SOCKET_FILE "/tmp/server.sock"
+#define DEFAULT_SOCKET_FILE "/tmp/umq-server.sock"
 
 /**
  * Program runtime options.
@@ -19,7 +19,7 @@ struct options {
     bool help;
     /** Set log level to debug. */
     bool verbose;
-    /** Path of the service's configuration file */
+    /** Path of the configuration file */
     const char *config_file;
     /** Path of the server's socket file */
     const char *socket_file;

@@ -19,13 +19,11 @@ void msg(const char *fmt, ...)
     static char line[LINESIZE];
     va_list args;
 
-    if (!_messages_on)
-    return;
-
-    va_start(args, fmt);
-    vsnprintf(line, LINESIZE, fmt, args);
-    va_end(args);
-
-    puts(line);
+    if (_messages_on) {
+        va_start(args, fmt);
+        vsnprintf(line, LINESIZE, fmt, args);
+        va_end(args);
+        puts(line);
+    }
 }
 
