@@ -1,4 +1,8 @@
-#include "alpha.h"
+/** @ingroup cppexp
+ * @{
+ */
+
+#include "alpha.hpp"
 
 A::A() : m_text("") {}
 
@@ -30,4 +34,6 @@ void B::set_number(int n)
 
 C::C() : A(), B() {}
 C::~C() {}
+
+/** @} */
 

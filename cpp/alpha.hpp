@@ -1,5 +1,8 @@
-#ifndef ALPHA_H
-#define ALPHA_H
+/** @ingroup cppexp
+ * @{
+ */
+#ifndef ALPHA_HPP
+#define ALPHA_HPP
 
 #include <string>
 
@@ -32,5 +35,7 @@ public:
     ~C();
 };
 
-#endif //ALPHA_H
+#endif //ALPHA_HPP
+
+/** @} */
 

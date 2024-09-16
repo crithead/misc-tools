@@ -1,5 +1,8 @@
+/// @ingroup cppexp
+/// @{
+
 #include <iostream>
-#include "goblin.h"
+#include "goblin.hpp"
 
 Goblin& TheMasterGoblin(void);
 
@@ -27,4 +30,6 @@ Goblin& TheMasterGoblin(void)
     static Goblin theMasterGoblin("The Master", Goblin::Master);
     return theMasterGoblin;
 }
+
+/// @}
 

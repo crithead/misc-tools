@@ -1,19 +1,20 @@
 /**
  *  Bit stream management.
+ *  @addtogroup coinflip
+ *  @{
  */
 
-/**
- *  Bits constants.
- */
+/** Bit stream styles. */
 enum {
-    BITS_STYLE_SIGNED,      /* +1 or -1 */
-    BITS_STYLE_UNSIGNED,    /* 1 or 0 */
+    /** +1 or -1 */
+    BITS_STYLE_SIGNED,
+    /** 1 or 0 */
+    BITS_STYLE_UNSIGNED,
+    /** Error value */
     BITS_ERROR = 0x7f
 };
 
-/**
- *  An opaque structure containing bit stream information.
- */
+/* An opaque structure containing bit stream information. */
 struct bits;
 
 /**
@@ -35,4 +36,6 @@ extern struct bits *new_bits(int num_bits, int style);
  * @return A char with a value for the next bit.
  */
 extern char next_bit(struct bits *bits);
+
+/** @} */
 

@@ -1,3 +1,6 @@
+/// @ingroup cppexp
+/// @{
+
 /* C++ class experiments.
  *
  */
@@ -5,7 +8,7 @@
 #include <iomanip>
 #include <string>
 
-#include "pet.h"
+#include "pet.hpp"
 
 enum e1 {
     E_VAL1,
@@ -55,3 +58,6 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+/// @}
+

@@ -1,9 +1,10 @@
-// E
+/// @ingroup cppexp
+/// @{
 
 #include <iostream>
 #include <string>
 
-#include "complex.h"
+#include "complex.hpp"
 
 //using namespace std;
 
@@ -177,3 +178,6 @@ int main(int argc, char **argv)
 }
 
 #endif // TEST
+
+/// @}
+

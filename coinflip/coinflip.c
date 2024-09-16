@@ -1,7 +1,8 @@
-/*
+/**
+ * @defgroup coinflip 
  *  Produce a plot of a random coin flip.
  *  Sums the bits.
- *
+ * @{
  */
 #include <string.h>
 #include <stdio.h>
@@ -21,16 +22,16 @@ extern int optind, opterr, optopt;
  * Plot infomation
  */
 struct info {
-    /* The name of the plot file */
+    /** The name of the plot file */
     const char *plotname;
-    /* The  plot title */
+    /** The  plot title */
     const char *plot_title;
-    /* The number of coins to flip */
+    /** The number of coins to flip */
     int num_values;
     int bits_style;
-    /* Include a count column on each data line */
+    /** Include a count column on each data line */
     int count_column;
-    /* Put a column header line in each data file */
+    /** Put a column header line in each data file */
     int data_headers;
     int min_total;
     int max_total;
@@ -283,4 +284,6 @@ static void print_help(void)
     puts("  -u          Use unsigned bits (0 or 1)");
     puts("");
 }
+
+/** @} End of coinflip group */
 

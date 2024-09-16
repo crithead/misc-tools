@@ -139,6 +139,10 @@ cpp/vector
 cpp/wordfreq
 cpp/wordfreq2
 
+doc/html
+doc/latex
+doc/doxygen.log
+
 # service
 service/templated
 

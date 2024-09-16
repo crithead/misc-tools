@@ -1,8 +1,8 @@
-//
-//
-//
+/// @ingroup cppexp
+/// @{
+/// A message queue class
 
-#include "messagequeue.h"
+#include "messagequeue.hpp"
 
 
 Message::Message(const char *);
@@ -10,6 +10,7 @@ Message::~Message();
 void *Message::msg;
 
 
+/// A message queue.
 class MessageQueue
 {
 public:
@@ -27,4 +28,6 @@ private:
 };
 
 #endif /* MESSAGE_QUEUE_HEADER */
+
+/// @{
 
