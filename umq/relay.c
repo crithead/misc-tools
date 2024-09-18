@@ -10,10 +10,12 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/un.h>
+#include <time.h>
 #include <unistd.h>
 
 #define MSG_TXT_LEN 24
@@ -29,14 +31,12 @@ static void enable_messages(bool en)
 
 static void msg(const char *fmt, ...)
 {
-    static char line[LINESIZE];
-    va_list args;
-
     if (_messages_on) {
+        va_list args;
         va_start(args, fmt);
-        vsnprintf(line, LINESIZE, fmt, args);
+        vprintf(fmt, args);
         va_end(args);
-        puts(line);
+        putchar('\n');
     }
 }
 
@@ -67,8 +67,8 @@ static const char *TFTAB[] = {
 
 static int tf_enum(const char *s)
 {
-    for (int i = TF_NONE; i < TF_LAST, i++) {
-        if (strncmp(s, TFTAB[i]) == 0) {
+    for (int i = TF_NONE; i < TF_LAST; i++) {
+        if (strncmp(s, TFTAB[i], 4) == 0) {
             return i;
         }
     }
@@ -95,7 +95,7 @@ struct options {
 
 struct message {
     int message_id;
-    char text[MSG_TXT_LEN]
+    char text[MSG_TXT_LEN];
     int checksum;
 };
 
@@ -209,15 +209,14 @@ static void print_usage(void)
  */
 static int wait_for_output(const char *socket_file)
 {
+    extern int nanosleep(const struct timespec *, struct timespec *);
     struct timespec ts = { 0, 100000000 };  /* 0.1 sec */
 
     while (true) {
-        struct stat sf;
-        int err = stat(socket_file, &sf);
+        struct stat ss;
+        int err = stat(socket_file, &ss);
         if (err == 0) {
-            if (sf.st_mode & SIFMT == S_IFSOCK) {
-                return 0;
-            }
+            return 0;
         }
 
         nanosleep(&ts, NULL);
@@ -230,7 +229,7 @@ static int calc_cksum(const char *buf, size_t len)
 {
     (void)buf;
     (void)len;
-    return 0;
+    return 0x5A5A5A5A;
 }
 
 /* The "origin" creates new messages for output.  It reads input messages, but
@@ -238,7 +237,9 @@ static int calc_cksum(const char *buf, size_t len)
  */
 static int run_origin(struct options *opts)
 {
+    (void)opts;
     /* TODO */
+    return -1;
 }
 
 static int run_relay(struct options *opts)
@@ -269,7 +270,7 @@ static int run_relay(struct options *opts)
         return -1;
     }
 
-    err = wait_for_output(opts->output_file)
+    err = wait_for_output(opts->output_file);
     if (err < 0) {
         msg("timed out waiting for output socket");
         return 2;
@@ -297,7 +298,7 @@ static int run_relay(struct options *opts)
     while (_relay_up) {
         char msgbuf[MSG_LEN];
 
-        ssize_t n = recvfrom(fd, msgbuf, MSG_LEN, 0, NULL, NULL);
+        ssize_t n = recvfrom(ifd, msgbuf, MSG_LEN, 0, NULL, NULL);
         if (n != MSG_LEN) {
             msg("Incomplete message (%ld/%ld)", n, MSG_LEN);
             continue;
@@ -305,11 +306,11 @@ static int run_relay(struct options *opts)
 
         struct message *m = (struct message *)msgbuf;
 
-        if (m->mesage_id == MSG_ID_QUIT) {
+        if (m->message_id == MSG_ID_QUIT) {
             _relay_up = false;
         }
 
-        int cksum = calc_cksum(m->text);
+        int cksum = calc_cksum(m->text, MSG_TXT_LEN);
         if (cksum != m->checksum) {
             msg("bad checksum");
             continue;
@@ -318,11 +319,11 @@ static int run_relay(struct options *opts)
         switch (opts->transform) {
             case TF_NONE:
                 break;
-            case TF_LOWER:
+            case TF_LOWER: {
                 text_lower(m->text, MSG_TXT_LEN);
                 break;
             }
-            case MSG_F32: {
+            case TF_UPPER: {
                 text_upper(m->text, MSG_TXT_LEN);
                 break;
             }
@@ -337,10 +338,13 @@ static int run_relay(struct options *opts)
 
     msg("relay offlne");
 
-    if (close(fd) == -1) {
+    if (close(ifd) == -1) {
         perror("close");
     }
-    if (unlink(opts->socket_file) == -1) {
+    if (close(ofd) == -1) {
+        perror("close");
+    }
+    if (unlink(opts->input_file) == -1) {
         perror("unlink");
     }
 
@@ -350,7 +354,7 @@ static int run_relay(struct options *opts)
 
 int main(int argc, char **argv)
 {
-    struct options opts;
+    struct options opts = {0};
     init_options(argc, argv, &opts);
 
     if (opts.help) {
