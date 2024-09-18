@@ -10,4 +10,4 @@
 
 extern void enable_messages(bool en);
 extern void msg(const char *fmt, ...);
-
+extern int randint(void);

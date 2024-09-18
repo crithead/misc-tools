@@ -1,6 +1,10 @@
 CC = gcc
 CFLAGS += -Wall -Werror -std=c17
 
+ifeq ($(DEBUG), 1)
+CFLAGS += -g
+endif
+
 SOURCES := server.c
 SOURCES += client.c
 SOURCES += helpers.c
@@ -25,4 +29,3 @@ clean:
 	@rm -f client server relay $(OBJECTS)
 
 .PHONY: all clean
-

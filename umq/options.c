@@ -12,15 +12,15 @@ int init_options(int argc, char **argv, struct options *opts)
 
     /* Set defaults */
     opts->help = false;
+    opts->quit = false;
     opts->verbose = false;
-    opts->config_file = DEFAULT_CONFIG_FILE;
     opts->socket_file = DEFAULT_SOCKET_FILE;
 
-    static const char SHORT_OPTIONS[] = "c:hs:v";
+    static const char SHORT_OPTIONS[] = "hqs:v";
     static struct option LONG_OPTIONS[] = {
-        {"config-file", required_argument,  0,  'c' },
         {"socket-file", required_argument,  0,  's' },
         {"help",        no_argument,        0,  'h' },
+        {"quit",        no_argument,        0,  'q' },
         {"verbose",     no_argument,        0,  'v' },
         {0,             0,                  0,   0 }
     };
@@ -30,11 +30,11 @@ int init_options(int argc, char **argv, struct options *opts)
 
     while (c != -1) {
         switch (c) {
-        case 'c':
-            opts->config_file = optarg;
-            break;
         case 'h':
             opts->help = true;
+            break;
+        case 'q':
+            opts->quit = true;
             break;
         case 's':
             opts->socket_file = optarg;
@@ -50,4 +50,3 @@ int init_options(int argc, char **argv, struct options *opts)
 
     return 0;
 }
-

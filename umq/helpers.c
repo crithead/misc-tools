@@ -27,3 +27,14 @@ void msg(const char *fmt, ...)
     }
 }
 
+int randint(void)
+{
+    int value= 0;
+    FILE *fp = fopen("/dev/random", "r");
+    size_t n = fread(&value, sizeof(value), 1, fp);
+    if (n < sizeof(value) && ferror(fp)) {
+        fprintf(stderr, "fread");
+    }
+    (void)fclose(fp);
+    return value;
+}

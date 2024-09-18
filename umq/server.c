@@ -32,7 +32,6 @@ int main(int argc, char **argv)
 
     if (opts.verbose) {
         enable_messages(true);
-        printf("config_file = %s (NOT USED)\n", opts.config_file);
         printf("socket_file = %s\n", opts.socket_file);
     }
 
@@ -46,8 +45,6 @@ static void print_usage(void)
 \n\
         -h, --help      Print a usage message and exit\n\
         -v, --verbose   Enable verbose output\n\
-        -c FILE, --config-file FILE\n\
-                        Read configuration from this file\n\
         -s FILE, --socket-file FILE\n\
                         Server socket file\n\
 \n";
@@ -64,15 +61,16 @@ static int run_server(struct options *opts)
     msg("server start");
 
     msg("socket");
-    int fd = socket(AF_UNIX, SOCK_DGRAM, 0);
+    int fd = socket(AF_LOCAL, SOCK_DGRAM, 0);
     if (fd < 0) {
         perror("socket");
         return -1;
     }
 
     struct sockaddr_un sa = {0};
-    sa.sun_family = AF_UNIX,
+    sa.sun_family = AF_LOCAL,
     strncpy(sa.sun_path, opts->socket_file, strlen(opts->socket_file));
+    (void)unlink(sa.sun_path);
 
     msg("bind");
     int err = bind(fd, (struct sockaddr *)&sa, sizeof(sa));
@@ -84,6 +82,7 @@ static int run_server(struct options *opts)
     msg("server online");
     bool server_up = true;
     while (server_up) {
+        int status = STATUS_OK;
         char rxbuf[RX_BUF_LEN];
         ssize_t n = recvfrom(fd, rxbuf, RX_BUF_LEN, 0, NULL, NULL);
         if (n < RX_BUF_LEN) {
@@ -94,7 +93,7 @@ static int run_server(struct options *opts)
         msg("message -> %08X, %08X", m->message_id, m->request_id);
         switch (m->message_id) {
             case MSG_TEXT:
-                printf("%24s\n", m->text);
+                printf("%s\n", m->text);
                 break;
             case MSG_U32: {
                 unsigned int value = m->u32;
@@ -110,8 +109,41 @@ static int run_server(struct options *opts)
                 server_up = false;
                 break;
             default:
-                printf("Msg ID = %d\n", m->message_id);
+                status = STATUS_BAD_REQUEST;
+                printf("Bad Msg %d\n", m->message_id);
                 break;
+        }
+
+        int rd = socket(AF_LOCAL, SOCK_DGRAM, 0);
+        if (rd < 0) {
+            perror("socket");
+            continue;
+        }
+
+        struct sockaddr_un rsa = {0};
+        rsa.sun_family = AF_LOCAL,
+        snprintf(rsa.sun_path, 107, "/tmp/%08x.sock", m->request_id);
+
+        err = connect(rd, (struct sockaddr *)&rsa, sizeof(rsa));
+        if (err < 0) {
+            perror("connect");
+            close(rd);
+            continue;
+        }
+
+        struct message rsp = {0};
+        rsp.message_id = MSG_STATUS;
+        rsp.request_id = m->request_id;
+        rsp.status = status;
+
+        n = sendto(rd, &rsp, MSG_LEN, 0, NULL, 0);
+        if (n != MSG_LEN) {
+            perror("sendto");
+        }
+
+        err = close(rd);
+        if (err < 0) {
+            perror("close");
         }
     }
 
@@ -127,4 +159,3 @@ static int run_server(struct options *opts)
     msg("server exit");
     return 0;
 }
-
