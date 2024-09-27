@@ -1,6 +1,7 @@
 
 #include <getopt.h>
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "options.h"
 
@@ -14,11 +15,13 @@ int init_options(int argc, char **argv, struct options *opts)
     opts->help = false;
     opts->quit = false;
     opts->verbose = false;
+    opts->port = DEFAULT_SERVER_PORT;
     opts->socket_file = DEFAULT_SOCKET_FILE;
 
-    static const char SHORT_OPTIONS[] = "hqs:v";
+    static const char SHORT_OPTIONS[] = "hp:qs:v";
     static struct option LONG_OPTIONS[] = {
         {"socket-file", required_argument,  0,  's' },
+        {"port",        required_argument,  0,  'p' },
         {"help",        no_argument,        0,  'h' },
         {"quit",        no_argument,        0,  'q' },
         {"verbose",     no_argument,        0,  'v' },
@@ -32,6 +35,9 @@ int init_options(int argc, char **argv, struct options *opts)
         switch (c) {
         case 'h':
             opts->help = true;
+            break;
+        case 'p':
+            opts->port = atoi(optarg);
             break;
         case 'q':
             opts->quit = true;

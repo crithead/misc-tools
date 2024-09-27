@@ -8,6 +8,9 @@
 /** Default name of the server socket file. */
 #define DEFAULT_SOCKET_FILE "/tmp/umq-server.sock"
 
+/** Default server socket port number. */
+#define DEFAULT_SERVER_PORT 2075
+
 /**
  * Program runtime options.
  */
@@ -18,6 +21,8 @@ struct options {
     bool verbose;
     /** Send a QUIT message (Client only) */
     bool quit;
+    /** Server port */
+    unsigned short port;
     /** Path of the server's socket file */
     const char *socket_file;
 };

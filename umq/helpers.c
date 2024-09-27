@@ -2,6 +2,7 @@
  * UMQ Helper functions.
  */
 
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -27,14 +28,25 @@ void msg(const char *fmt, ...)
     }
 }
 
-int randint(void)
+int randint(int a, int b)
 {
-    int value= 0;
+    int value = 0;
     FILE *fp = fopen("/dev/random", "r");
     size_t n = fread(&value, sizeof(value), 1, fp);
     if (n < sizeof(value) && ferror(fp)) {
         fprintf(stderr, "fread");
     }
     (void)fclose(fp);
+
+    if (a != 0 && b != 0) {
+        if (a > b) {
+            int t = a;
+            a = b;
+            b = t;
+        }
+        double f = (double)ABS(n) / (double)INT_MAX;
+        value = a + (int)(f * (double)(b - a + 1));
+    }
+
     return value;
 }

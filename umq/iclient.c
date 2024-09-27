@@ -1,9 +1,11 @@
 /*
- * Unix-domain UDP MQ client.
+ * Inet UDP client.
  */
 
 #include <sys/socket.h>
-#include <sys/un.h>
+#include <netinet/in.h>
+#include <netinet/udp.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -36,20 +38,20 @@ int main(int argc, char **argv)
     return run_client(&opts);
 }
 
-
 /**
  * Print helpful usage information.
  */
 static void print_usage(void)
 {
-    static const char USAGE[] = "\n\
+    static const char USAGE[] =
+            "\n\
         client [ -hqv ] [ -s socket-file ] [ --help ] [ --quit ]\n\
 \n\
         -h, --help      Print a usage message and exit\n\
         -q, --quit      Send a quit message\n\
         -v, --verbose   Enable verbose output\n\
-        -s FILE, --socket-file FILE\n\
-                        Server socket file\n\
+        -p N, --port N\n\
+                        Server socket port\n\
 \n";
 
     puts(USAGE);
@@ -57,7 +59,7 @@ static void print_usage(void)
 }
 
 /**
- * Open a connection to the server's socket, open a response socket, send
+ * Open a conneciton to the server's socket, open a response socket, send
  * a request to the server, receive a response from the server.
  * @param opts Program options
  * @retval  0 Ok
@@ -69,96 +71,102 @@ static int run_client(struct options *opts)
         return -1;
     }
 
-    int request_id = randint(0, 0);
-    request_id = ABS(request_id);
+    /* Request ID is client's response port number. */
+    int request_id = randint(opts->port + 100, opts->port + 1000);
     msg("client's request id %d", request_id);
 
     /* Create client's response socket */
     msg("client socket");
-    int cf = socket(AF_UNIX, SOCK_DGRAM, 0);
-    if (cf < 0) {
+    int cs = socket(AF_INET, SOCK_DGRAM, 0);
+    if (cs < 0) {
         perror("socket");
         return -1;
     }
 
-    struct sockaddr_un rsa = {0};
-    rsa.sun_family = AF_LOCAL;
-    snprintf(rsa.sun_path, 107, "/tmp/%08x.sock", request_id);
-    (void)unlink(rsa.sun_path);
-    int err = bind(cf, (struct sockaddr *)&rsa, sizeof(rsa));
-    if (err < 0) {
+    socklen_t rsa_len = sizeof(struct sockaddr_in);
+    struct sockaddr_in rsa = {0};
+    rsa.sin_family = AF_INET;
+    rsa.sin_port = htons(request_id);
+    rsa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+
+    msg("client bind");
+    int err = bind(cs, (struct sockaddr *)&rsa, rsa_len);
+    if (err != 0) {
         perror("bind");
         return -1;
     }
 
-    /* Open server's socket */
+    /* Open server socket */
     msg("server socket");
-    int sf = socket(AF_UNIX, SOCK_DGRAM, 0);
-    if (sf < 0) {
+    int ss = socket(AF_INET, SOCK_DGRAM, 0);
+    if (ss < 0) {
         perror("socket");
         return -1;
     }
 
-    struct sockaddr_un sa = {0};
-    sa.sun_family = AF_UNIX;
-    strncpy(sa.sun_path, opts->socket_file, strlen(opts->socket_file));
+    size_t ssa_len = sizeof(struct sockaddr_in);
+    struct sockaddr_in ssa;
+    ssa.sin_family = AF_INET;
+    ssa.sin_port = htons(opts->port);
+    ssa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
-    err = connect(sf, (const struct sockaddr *)&sa, sizeof(sa));
-    if (err < 0) {
-        perror("connect");
-        return -1;
-    }
-
-    char txbuf[MSG_LEN];
+    char txbuf[MSG_LEN] = {0};
     struct message *txmsg = (struct message *)txbuf;
 
     /* Send message #1 */
-    printf("message 1 = text\n");
     txmsg->message_id = MSG_TEXT;
     txmsg->request_id = request_id;
     strncpy(txmsg->text, "Green Lumber", 13);
-    msg("sendto ( text '%s' )", txmsg->text);
-    ssize_t n = sendto(sf, txbuf, MSG_LEN, 0, NULL, 0);
+    printf("message 1 (%s)\n", txmsg->text);
+
+    msg("sendto ( text '%s', port %d, addr %08X )",
+        txmsg->text, ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+    ssize_t n = sendto(ss, txbuf, MSG_LEN, 0,
+                       (struct sockaddr *)&ssa, ssa_len);
     if (n != MSG_LEN) {
         perror("sendto");
-        (void)close(cf);
-        (void)close(sf);
+        (void)close(ss);
         return -1;
     }
 
     /* Response #1 */
+    struct sockaddr_in src = {0};
+    socklen_t src_len = sizeof(struct sockaddr_in);
+
     msg("recvfrom");
     struct message rsp = {0};
-    n = recvfrom(cf, &rsp, MSG_LEN, 0, NULL, 0);
+    n = recvfrom(cs, &rsp, MSG_LEN, 0, (struct sockaddr *)&src, &src_len);
     if (n != MSG_LEN) {
         perror("recvfrom");
     }
     if (rsp.message_id == MSG_STATUS && rsp.request_id == request_id) {
-        printf("response 1 = %d\n", rsp.status);
+        printf("response 1 (%d)\n", rsp.status);
     } else {
         fprintf(stderr, "Invalid response: message_id %d, request_id %d\n",
                 rsp.message_id, rsp.request_id);
     }
 
     /* Send message #2 */
-    printf("message 2 = U32\n");
     memset(txbuf, 0, MSG_LEN);
     txmsg->message_id = MSG_U32;
     txmsg->request_id = request_id;
     txmsg->u32 = 3141592653U;
-    msg("sendto ( u32 %u )", txmsg->u32);
-    sendto(sf, txbuf, MSG_LEN, 0, NULL, 0);
+    printf("message 2 (%u)\n", txmsg->u32);
+
+    msg("sendto ( U32 '%d', port %d, addr %08X )",
+        txmsg->u32, ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+    sendto(ss, txbuf, MSG_LEN, 0, (struct sockaddr *)&ssa, ssa_len);
     if (n != MSG_LEN) {
         perror("sendto");
-        (void)close(cf);
-        (void)close(sf);
+        (void)close(ss);
+        (void)close(cs);
         return -1;
     }
 
     /* Response #2 */
     msg("recvfrom");
     memset(&rsp, 0, sizeof(rsp));
-    n = recvfrom(cf, &rsp, MSG_LEN, 0, NULL, 0);
+    n = recvfrom(cs, &rsp, MSG_LEN, 0, (struct sockaddr *)&rsa, &rsa_len);
     if (n != MSG_LEN) {
         perror("recvfrom");
     }
@@ -170,23 +178,25 @@ static int run_client(struct options *opts)
     }
 
     /* Send message #3 */
-    printf("message 3 = ?!?\n");
     memset(txbuf, 0, MSG_LEN);
     txmsg->message_id = MSG_LAST + 123;
     txmsg->request_id = request_id;
-    msg("sendto ( <bad msg> )");
-    sendto(sf, txbuf, MSG_LEN, 0, NULL, 0);
+    printf("message 3 (?!?)\n");
+
+    msg("sendto ( <BAD MSG> , port %d, addr %08X )",
+        ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+    sendto(ss, txbuf, MSG_LEN, 0, (struct sockaddr *)&ssa, ssa_len);
     if (n != MSG_LEN) {
         perror("sendto");
-        (void)close(cf);
-        (void)close(sf);
+        (void)close(ss);
+        (void)close(cs);
         return -1;
     }
 
     /* Response #3 */
     msg("recvfrom");
     memset(&rsp, 0, sizeof(rsp));
-    n = recvfrom(cf, &rsp, MSG_LEN, 0, NULL, 0);
+    n = recvfrom(cs, &rsp, MSG_LEN, 0, (struct sockaddr *)&rsa, &rsa_len);
     if (n != MSG_LEN) {
         perror("recvfrom");
     }
@@ -198,29 +208,31 @@ static int run_client(struct options *opts)
     }
 
     /* Send message #4 */
-    printf("message 4 = F32\n");
     memset(txbuf, 0, MSG_LEN);
     txmsg->message_id = MSG_F32;
     txmsg->request_id = request_id;
     txmsg->f32 = 2.718281;
-    msg("sendto ( f32 %f )", txmsg->f32);
-    sendto(sf, txbuf, MSG_LEN, 0, NULL, 0);
+    printf("message 4 (%f)\n", txmsg->f32);
+
+    msg("sendto ( f32 %f, port %d, addr %08X )",
+        txmsg->f32, ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+    sendto(ss, txbuf, MSG_LEN, 0, (struct sockaddr *)&ssa, ssa_len);
     if (n != MSG_LEN) {
         perror("sendto");
-        (void)close(cf);
-        (void)close(sf);
+        (void)close(ss);
+        (void)close(cs);
         return -1;
     }
 
     /* Response #4 */
     msg("recvfrom");
     memset(&rsp, 0, sizeof(rsp));
-    n = recvfrom(cf, &rsp, MSG_LEN, 0, NULL, 0);
+    n = recvfrom(cs, &rsp, MSG_LEN, 0, (struct sockaddr *)&rsa, &rsa_len);
     if (n != MSG_LEN) {
         perror("recvfrom");
     }
     if (rsp.message_id == MSG_STATUS && rsp.request_id == request_id) {
-        printf("response 4 = %d\n", rsp.status);
+        printf("response 4 (%d)\n", rsp.status);
     } else {
         fprintf(stderr, "Invalid response: message_id %d, request_id %d\n",
                 rsp.message_id, rsp.request_id);
@@ -228,39 +240,37 @@ static int run_client(struct options *opts)
 
     if (opts->quit) {
         /* Send message #5 */
-        printf("message 5 = QUIT\n");
         txmsg->message_id = MSG_QUIT;
         txmsg->request_id = request_id;
-        msg("sendto ( QUIT )");
-        sendto(sf, txbuf, MSG_LEN, 0, NULL, 0);
+        printf("message 5 (QUIT)\n");
+
+        msg("sendto ( QUIT, port %d, addr %08X )",
+            ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+        sendto(ss, txbuf, MSG_LEN, 0, (struct sockaddr *)&ssa, ssa_len);
         if (n != MSG_LEN) {
             perror("sendto");
         }
 
         msg("recvfrom");
         memset(&rsp, 0, sizeof(rsp));
-        n = recvfrom(cf, &rsp, MSG_LEN, 0, NULL, 0);
+        n = recvfrom(cs, &rsp, MSG_LEN, 0, (struct sockaddr *)&src, &src_len);
         if (n != MSG_LEN) {
             perror("recvfrom");
         }
         if (rsp.message_id == MSG_STATUS && rsp.request_id == request_id) {
-            printf("response 5 = %d\n", rsp.status);
+            printf("response 5 (%d)\n", rsp.status);
         } else {
             fprintf(stderr, "Invalid response: message_id %d, request_id %d\n",
                     rsp.message_id, rsp.request_id);
         }
     }
 
-    if (close(cf) == -1) {
+    if (close(cs) < 0) {
         perror("close");
     }
 
-    if (close(sf) == -1) {
+    if (close(ss) < 0) {
         perror("close");
-    }
-
-    if (unlink(rsa.sun_path) == -1) {
-        perror("unlink");
     }
 
     return 0;

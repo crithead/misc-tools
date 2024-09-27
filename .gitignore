@@ -143,6 +143,8 @@ doc/html
 doc/latex
 doc/doxygen.log
 
+misc/errno
+
 # service
 service/templated
 
@@ -150,3 +152,5 @@ service/templated
 umq/client
 umq/relay
 umq/server
+umq/iclient
+umq/iserver

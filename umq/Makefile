@@ -12,7 +12,7 @@ SOURCES += options.c
 
 OBJECTS := $(SOURCES:.c=.o)
 
-all : server client relay
+all : server client relay iclient iserver
 
 client : $(OBJECTS)
 	$(CC) $(CFLAGS) -o $@ $(filter-out server.o, $^)
@@ -23,9 +23,17 @@ server : $(OBJECTS)
 relay : relay.c
 	$(CC) $(CFLAGS) -o $@ $^
 
+iclient: iclient.o helpers.o options.o
+	$(CC) $(CFLAGS) -o $@ $^
+
+iserver: iserver.o helpers.o options.o
+	$(CC) $(CFLAGS) -o $@ $^
+
 %.o: %.c %.h
 
 clean:
-	@rm -f client server relay $(OBJECTS)
+	@rm -f client server relay
+	@rm -f iclient iserver
+	@rm -f *.o
 
 .PHONY: all clean
