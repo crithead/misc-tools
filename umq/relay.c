@@ -61,9 +61,7 @@ enum {
     TF_LAST
 };
 
-static const char *TFTAB[] = {
-    "none", "upper", "lower"
-};
+static const char *TFTAB[] = {"none", "upper", "lower"};
 
 static int tf_enum(const char *s)
 {
@@ -78,9 +76,9 @@ static int tf_enum(const char *s)
 static const char *tf_str(int tf)
 {
     if (tf <= TF_NONE || tf >= TF_LAST) {
-        return TFTAB[ 0 ];
+        return TFTAB[0];
     } else {
-        return TFTAB[ tf ];
+        return TFTAB[tf];
     }
 }
 
@@ -117,14 +115,13 @@ static int init_options(int argc, char **argv, struct options *opts)
 
     static const char SHORT_OPTIONS[] = "hi:n:o:t:v";
     static struct option LONG_OPTIONS[] = {
-        {"input-file",  required_argument,  0,  'i' },
-        {"output-file", required_argument,  0,  'o' },
-        {"number",      required_argument,  0,  'n' },
-        {"transform",   required_argument,  0,  't' },
-        {"help",        no_argument,        0,  'h' },
-        {"verbose",     no_argument,        0,  'v' },
-        {0,             0,                  0,   0 }
-    };
+            {"input-file", required_argument, 0, 'i'},
+            {"output-file", required_argument, 0, 'o'},
+            {"number", required_argument, 0, 'n'},
+            {"transform", required_argument, 0, 't'},
+            {"help", no_argument, 0, 'h'},
+            {"verbose", no_argument, 0, 'v'},
+            {0, 0, 0, 0}};
 
     int option_index = 0;
     int c = getopt_long(argc, argv, SHORT_OPTIONS, LONG_OPTIONS, &option_index);
@@ -176,7 +173,8 @@ static int text_upper(char *txt, size_t len)
 
 static void print_usage(void)
 {
-    static const char USAGE[] = "\n\
+    static const char USAGE[] =
+            "\n\
         server [ -hv ] [ -c config-file ]\n\
 \n\
         -h, --help      Print a usage message and exit\n\
@@ -200,7 +198,6 @@ static void print_usage(void)
     puts(USAGE);
 }
 
-
 /**
  * Wait (forever) for the output socket file.
  * @param socket_file
@@ -210,7 +207,7 @@ static void print_usage(void)
 static int wait_for_output(const char *socket_file)
 {
     extern int nanosleep(const struct timespec *, struct timespec *);
-    struct timespec ts = { 0, 100000000 };  /* 0.1 sec */
+    struct timespec ts = {0, 100000000}; /* 0.1 sec */
 
     while (true) {
         struct stat ss;
@@ -317,21 +314,20 @@ static int run_relay(struct options *opts)
         }
 
         switch (opts->transform) {
-            case TF_NONE:
-                break;
-            case TF_LOWER: {
-                text_lower(m->text, MSG_TXT_LEN);
-                break;
-            }
-            case TF_UPPER: {
-                text_upper(m->text, MSG_TXT_LEN);
-                break;
-            }
-            default:
-                printf("Msg ID = %d\n", m->message_id);
-                break;
+        case TF_NONE:
+            break;
+        case TF_LOWER: {
+            text_lower(m->text, MSG_TXT_LEN);
+            break;
         }
-
+        case TF_UPPER: {
+            text_upper(m->text, MSG_TXT_LEN);
+            break;
+        }
+        default:
+            printf("Msg ID = %d\n", m->message_id);
+            break;
+        }
 
         /* TODO Send message to output_file */
     }
@@ -388,4 +384,3 @@ int main(int argc, char **argv)
         return run_origin(&opts);
     }
 }
-

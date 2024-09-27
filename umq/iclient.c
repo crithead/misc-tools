@@ -2,9 +2,9 @@
  * Inet UDP client.
  */
 
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/udp.h>
+#include <sys/socket.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -55,7 +55,6 @@ static void print_usage(void)
 \n";
 
     puts(USAGE);
-
 }
 
 /**
@@ -119,10 +118,9 @@ static int run_client(struct options *opts)
     strncpy(txmsg->text, "Green Lumber", 13);
     printf("message 1 (%s)\n", txmsg->text);
 
-    msg("sendto ( text '%s', port %d, addr %08X )",
-        txmsg->text, ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
-    ssize_t n = sendto(ss, txbuf, MSG_LEN, 0,
-                       (struct sockaddr *)&ssa, ssa_len);
+    msg("sendto ( text '%s', port %d, addr %08X )", txmsg->text,
+        ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+    ssize_t n = sendto(ss, txbuf, MSG_LEN, 0, (struct sockaddr *)&ssa, ssa_len);
     if (n != MSG_LEN) {
         perror("sendto");
         (void)close(ss);
@@ -153,8 +151,8 @@ static int run_client(struct options *opts)
     txmsg->u32 = 3141592653U;
     printf("message 2 (%u)\n", txmsg->u32);
 
-    msg("sendto ( U32 '%d', port %d, addr %08X )",
-        txmsg->u32, ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+    msg("sendto ( U32 '%d', port %d, addr %08X )", txmsg->u32,
+        ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
     sendto(ss, txbuf, MSG_LEN, 0, (struct sockaddr *)&ssa, ssa_len);
     if (n != MSG_LEN) {
         perror("sendto");
@@ -183,8 +181,8 @@ static int run_client(struct options *opts)
     txmsg->request_id = request_id;
     printf("message 3 (?!?)\n");
 
-    msg("sendto ( <BAD MSG> , port %d, addr %08X )",
-        ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+    msg("sendto ( <BAD MSG> , port %d, addr %08X )", ntohs(ssa.sin_port),
+        ntohl(ssa.sin_addr.s_addr));
     sendto(ss, txbuf, MSG_LEN, 0, (struct sockaddr *)&ssa, ssa_len);
     if (n != MSG_LEN) {
         perror("sendto");
@@ -214,8 +212,8 @@ static int run_client(struct options *opts)
     txmsg->f32 = 2.718281;
     printf("message 4 (%f)\n", txmsg->f32);
 
-    msg("sendto ( f32 %f, port %d, addr %08X )",
-        txmsg->f32, ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+    msg("sendto ( f32 %f, port %d, addr %08X )", txmsg->f32,
+        ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
     sendto(ss, txbuf, MSG_LEN, 0, (struct sockaddr *)&ssa, ssa_len);
     if (n != MSG_LEN) {
         perror("sendto");
@@ -244,8 +242,8 @@ static int run_client(struct options *opts)
         txmsg->request_id = request_id;
         printf("message 5 (QUIT)\n");
 
-        msg("sendto ( QUIT, port %d, addr %08X )",
-            ntohs(ssa.sin_port), ntohl(ssa.sin_addr.s_addr));
+        msg("sendto ( QUIT, port %d, addr %08X )", ntohs(ssa.sin_port),
+            ntohl(ssa.sin_addr.s_addr));
         sendto(ss, txbuf, MSG_LEN, 0, (struct sockaddr *)&ssa, ssa_len);
         if (n != MSG_LEN) {
             perror("sendto");

@@ -2,9 +2,9 @@
  * Inet UDP server.
  */
 
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/udp.h>
+#include <sys/socket.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -12,9 +12,9 @@
 #include <unistd.h>
 
 #include "helpers.h"
-#include "options.h"
-#include "message.h"
 #include "iserver.h"
+#include "message.h"
+#include "options.h"
 
 #define RX_BUF_LEN sizeof(struct message)
 
@@ -41,7 +41,8 @@ int main(int argc, char **argv)
 
 static void print_usage(void)
 {
-    static const char USAGE[] = "\n\
+    static const char USAGE[] =
+            "\n\
         iserver [ -hv ] [ -c config-file ]\n\
 \n\
         -h, --help      Print a usage message and exit\n\
@@ -69,7 +70,7 @@ static int run_server(struct options *opts)
     }
 
     struct sockaddr_in sa = {0};
-    sa.sin_family = AF_INET,
+    sa.sin_family = AF_INET;
     sa.sin_port = htons(opts->port);
     sa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 
@@ -88,36 +89,37 @@ static int run_server(struct options *opts)
         struct sockaddr_in src = {0};
         socklen_t src_len = sizeof(struct sockaddr_in);
 
-        ssize_t n = recvfrom(fd, rxbuf, RX_BUF_LEN, 0,
-                (struct sockaddr *)&src, &src_len);
+        ssize_t n = recvfrom(fd, rxbuf, RX_BUF_LEN, 0, (struct sockaddr *)&src,
+                             &src_len);
         if (n < RX_BUF_LEN) {
             msg("Incomplete message (%ld/%ld)", n, RX_BUF_LEN);
             continue;
         }
-        msg("recvfrom: src port %d, src addr %08X", ntohs(src.sin_port), ntohl(src.sin_addr.s_addr));
+        msg("recvfrom: src port %d, src addr %08X", ntohs(src.sin_port),
+            ntohl(src.sin_addr.s_addr));
         struct message *m = (struct message *)rxbuf;
         msg("message -> %08X, %08X", m->message_id, m->request_id);
         switch (m->message_id) {
-            case MSG_TEXT:
-                printf("TEXT: %s\n", m->text);
-                break;
-            case MSG_U32: {
-                unsigned int value = m->u32;
-                printf("U32: %u\n", value);
-                break;
-            }
-            case MSG_F32: {
-                float value = m->f32;
-                printf("F32: %f\n", value);
-                break;
-            }
-            case MSG_QUIT:
-                server_up = false;
-                break;
-            default:
-                status = STATUS_BAD_REQUEST;
-                printf("Bad Msg %d\n", m->message_id);
-                break;
+        case MSG_TEXT:
+            printf("TEXT: %s\n", m->text);
+            break;
+        case MSG_U32: {
+            unsigned int value = m->u32;
+            printf("U32: %u\n", value);
+            break;
+        }
+        case MSG_F32: {
+            float value = m->f32;
+            printf("F32: %f\n", value);
+            break;
+        }
+        case MSG_QUIT:
+            server_up = false;
+            break;
+        default:
+            status = STATUS_BAD_REQUEST;
+            printf("Bad Msg %d\n", m->message_id);
+            break;
         }
 
         int rs = socket(AF_INET, SOCK_DGRAM, 0);
@@ -127,7 +129,7 @@ static int run_server(struct options *opts)
         }
 
         struct sockaddr_in rsa = {0};
-        rsa.sin_family = AF_INET,
+        rsa.sin_family = AF_INET;
         rsa.sin_port = htons(m->request_id);
         rsa.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
         socklen_t rsa_len = sizeof(struct sockaddr_in);

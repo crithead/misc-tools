@@ -11,8 +11,8 @@
 #include <unistd.h>
 
 #include "helpers.h"
-#include "options.h"
 #include "message.h"
+#include "options.h"
 #include "server.h"
 
 #define RX_BUF_LEN sizeof(struct message)
@@ -40,7 +40,8 @@ int main(int argc, char **argv)
 
 static void print_usage(void)
 {
-    static const char USAGE[] = "\n\
+    static const char USAGE[] =
+            "\n\
         server [ -hv ] [ -c config-file ]\n\
 \n\
         -h, --help      Print a usage message and exit\n\
@@ -92,26 +93,26 @@ static int run_server(struct options *opts)
         struct message *m = (struct message *)rxbuf;
         msg("message -> %08X, %08X", m->message_id, m->request_id);
         switch (m->message_id) {
-            case MSG_TEXT:
-                printf("%s\n", m->text);
-                break;
-            case MSG_U32: {
-                unsigned int value = m->u32;
-                printf("%u\n", value);
-                break;
-            }
-            case MSG_F32: {
-                float value = m->f32;
-                printf("%f\n", value);
-                break;
-            }
-            case MSG_QUIT:
-                server_up = false;
-                break;
-            default:
-                status = STATUS_BAD_REQUEST;
-                printf("Bad Msg %d\n", m->message_id);
-                break;
+        case MSG_TEXT:
+            printf("%s\n", m->text);
+            break;
+        case MSG_U32: {
+            unsigned int value = m->u32;
+            printf("%u\n", value);
+            break;
+        }
+        case MSG_F32: {
+            float value = m->f32;
+            printf("%f\n", value);
+            break;
+        }
+        case MSG_QUIT:
+            server_up = false;
+            break;
+        default:
+            status = STATUS_BAD_REQUEST;
+            printf("Bad Msg %d\n", m->message_id);
+            break;
         }
 
         int rd = socket(AF_LOCAL, SOCK_DGRAM, 0);

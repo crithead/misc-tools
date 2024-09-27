@@ -20,13 +20,12 @@ int init_options(int argc, char **argv, struct options *opts)
 
     static const char SHORT_OPTIONS[] = "hp:qs:v";
     static struct option LONG_OPTIONS[] = {
-        {"socket-file", required_argument,  0,  's' },
-        {"port",        required_argument,  0,  'p' },
-        {"help",        no_argument,        0,  'h' },
-        {"quit",        no_argument,        0,  'q' },
-        {"verbose",     no_argument,        0,  'v' },
-        {0,             0,                  0,   0 }
-    };
+            {"socket-file", required_argument, 0, 's'},
+            {"port", required_argument, 0, 'p'},
+            {"help", no_argument, 0, 'h'},
+            {"quit", no_argument, 0, 'q'},
+            {"verbose", no_argument, 0, 'v'},
+            {0, 0, 0, 0}};
 
     int option_index = 0;
     int c = getopt_long(argc, argv, SHORT_OPTIONS, LONG_OPTIONS, &option_index);

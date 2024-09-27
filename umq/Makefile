@@ -31,9 +31,12 @@ iserver: iserver.o helpers.o options.o
 
 %.o: %.c %.h
 
+format:
+	clang-format --style file:./.clang-format -i *.c *.h
+
 clean:
 	@rm -f client server relay
 	@rm -f iclient iserver
 	@rm -f *.o
 
-.PHONY: all clean
+.PHONY: all clean format

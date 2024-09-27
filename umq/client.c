@@ -2,10 +2,10 @@
  * Unix-domain UDP MQ client.
  */
 
-#include <sys/socket.h>
-#include <sys/un.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <sys/un.h>
 #include <unistd.h>
 
 #include "client.h"
@@ -36,13 +36,13 @@ int main(int argc, char **argv)
     return run_client(&opts);
 }
 
-
 /**
  * Print helpful usage information.
  */
 static void print_usage(void)
 {
-    static const char USAGE[] = "\n\
+    static const char USAGE[] =
+            "\n\
         client [ -hqv ] [ -s socket-file ] [ --help ] [ --quit ]\n\
 \n\
         -h, --help      Print a usage message and exit\n\
@@ -53,7 +53,6 @@ static void print_usage(void)
 \n";
 
     puts(USAGE);
-
 }
 
 /**

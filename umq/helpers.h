@@ -8,7 +8,7 @@
 
 #define LINESIZE 1024
 
-#define ABS(X) (((X)<0)?(-X):(X))
+#define ABS(X) (((X) < 0) ? (-X) : (X))
 
 extern void enable_messages(bool en);
 extern void msg(const char *fmt, ...);
