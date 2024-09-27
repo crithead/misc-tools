@@ -1,5 +1,10 @@
 CC = g++
-CFLAGS = -Wall -pedantic --std=c++11
+CXXFLAGS = -Wall -pedantic --std=c++17
+CFLAGS = -Wall -pedantic --std=c17
+
+ifeq (DEBUG, 1)
+CFLAGS += -g
+endif
 
 OUTPUT_DIR = output
 
@@ -10,7 +15,7 @@ EXE = letters-to-numbers
 DOC := grayscale.1 create-index.1 letters-to-numbers.1
 DOC += grayscale.1.html create-index.1.html letters-to-numbers.1.html
 
-all: $(EXE)
+all: $(EXE) errno
 
 $(EXE): $(SRC)
 	$(CC) $(CFLAGS) -O2 $(SRC) -o $(EXE)
@@ -37,9 +42,11 @@ grayscale.1 grayscale.1.html: grayscale.1.txt
 letters-to-numbers.1 letters-to-numbers.1.html: letters-to-numbers.1.txt
 create-index.1 create-index.1.html: create-index.1.txt
 
+errno: errno.c
+	gcc $(CFLAGS) -o $@ $^
+
 .PHONY : clean
 clean:
-	rm -f $(OBJ) $(EXE) $(DOC)
+	rm -f $(OBJ) $(EXE) $(DOC) errno
 
 # End
-
