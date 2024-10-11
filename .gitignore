@@ -6,6 +6,7 @@ __pycache__/
 
 # C extensions
 *.so
+*.o
 
 # Distribution / packaging
 .Python
@@ -84,6 +85,7 @@ cpp/cpp11a
 cpp/cpp11b
 cpp/cpp11c
 cpp/cpp17demo
+cpp/dice
 cpp/drifter3
 cpp/drifter3dice
 cpp/enum
@@ -138,5 +140,18 @@ cpp/vector
 cpp/wordfreq
 cpp/wordfreq2
 
+doc/html
+doc/latex
+doc/doxygen.log
+
+misc/errno
+
 # service
 service/templated
+
+# unix message queue
+umq/client
+umq/relay
+umq/server
+umq/iclient
+umq/iserver

@@ -1,9 +1,15 @@
-// Program to use the A, B, C class hierarchy defined in alpha.h/alpha.cpp.
+/// @ingroup cppexp
+/// @{
+/// Program to use the A, B, C class hierarchy defined in alpha.h/alpha.cpp.
 
 #include <iostream>
 
-#include "alpha.h"
+#include "alpha.hpp"
 
+/// Run class hierarchy demo.
+/// @param argc Argument count
+/// @param argv Argument vector
+/// @retval 0 Always
 int main(int argc, char **argv)
 {
     // Give this instance of A a string
@@ -27,3 +33,5 @@ int main(int argc, char **argv)
 
     return 0;
 }
+/// @}
+

@@ -1,4 +1,7 @@
-#include "pet.h"
+/// @ingroup cppexp
+/// @{
+
+#include "pet.hpp"
 
 Pet::Pet(void)
 {
@@ -42,4 +45,6 @@ string& Pet::AsString(void)
     r = "Name: " + *name + ", Age: " + n;
     return r;
  }
+ 
+ /// @}
  

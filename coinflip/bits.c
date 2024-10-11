@@ -1,22 +1,35 @@
-
+/**
+ * @addtogroup coinflip
+ * @{
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "bits.h"
 
-
+/** Bits data */
 struct bits {
+    /** style */
     int style;
+    /** The byte stream. */
     char *octets;
-    size_t max_counts;      /* the maximum number of values */
+    /** the maximum number of values */
+    size_t max_counts;
+    /** the number of octets in the stream */
     size_t num_octets;
-    size_t bit;             /* the current bit in the current octet */
-    size_t octet;           /* the current octet */
-    size_t count;           /* the next value to get */
+    /** the current bit in the current octet */
+    size_t bit;
+    /** the current octet */
+    size_t octet;
+    /** the next value to get */
+    size_t count;
 };
 
-
+/**
+ * Increament the bit stream.
+ * @param bits Ref to bit data
+ */
 static void incr_bit(struct bits *bits)
 {
     bits->bit++;
@@ -26,7 +39,12 @@ static void incr_bit(struct bits *bits)
     }
 }
 
-
+/**
+ * Create a new bit stream.
+ * @param num_bits The number of bits in the steam.
+ * @param style The bit stream style
+ * @return An initialized bits structure
+ */
 struct bits *new_bits(int num_bits, int style)
 {
     int num_octets;
@@ -68,6 +86,11 @@ struct bits *new_bits(int num_bits, int style)
     return bits;
 }
 
+/**
+ * Get the next bit form the stream.
+ * @param bits A bits stream stucture
+ * @return The next bits in the strem
+ */
 char next_bit(struct bits* bits)
 {
     char value;
@@ -85,4 +108,6 @@ char next_bit(struct bits* bits)
 
     return value;
 }
+
+/** @} */
 

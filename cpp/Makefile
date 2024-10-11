@@ -29,7 +29,6 @@ TARGETS += first-unique
 TARGETS += functor
 TARGETS += global-object
 TARGETS += golden-ratio
-TARGETS += gnome
 TARGETS += increment
 TARGETS += int-except
 TARGETS += int-types
@@ -88,9 +87,6 @@ complex: CXXFLAGS += -DTEST
 cpp17demo: CXXFLAGS := -O2 -Wall -Wpedantic -std=c++17
 
 global-object: global-object.o goblin.o
-
-gnome: test-main.o test-gnome.o gnome.o
-	$(CC) $(CXXFLAGS) -o $@ $? -lcppunit
 
 # dynamic exception specifications are deprecated in C++11 and removed
 # in C++17, but this is an example of one so don't warn

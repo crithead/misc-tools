@@ -1,6 +1,9 @@
+/// @ingroup cppexp
+/// @{
+
 #include <stdexcept>
 
-#include "ringbuffer.h"
+#include "ringbuffer.hpp"
 
 ringbuffer::ringbuffer(size_t capacity) :
 	capacity(capacity), front(0), back(0), buffer(new int[capacity])
@@ -94,3 +97,6 @@ static void report(const ringbuffer& rb)
 }
 
 #endif // DEMO
+
+/// @}
+

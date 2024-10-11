@@ -5,7 +5,6 @@ _coinflip_ is a program that generates a stream of data by adding values, +1 or
 that are indistinguishable from those of stock prices.  This idea comes from
 Benoit Mandelbrot's _The (Mis)Behavior of Markets_.
 
-
 ## Basic Usage
 
 Examples

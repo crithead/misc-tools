@@ -1,6 +1,7 @@
-/*! pet.h
- *  Pet class.  Contains details about a pet.
- */
+/// @ingroup cppexp
+/// @{
+/// Pet class.  Contains details about a pet.
+
 #ifndef PET_H
 #define PET_H
 
@@ -8,8 +9,7 @@
 
 using namespace std;
 
-/*! \class Pet
- */
+/// @class Pet
 class Pet
 {
 public:
@@ -28,3 +28,6 @@ private:
 };
 
 #endif
+
+/// @}
+
