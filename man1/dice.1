@@ -1,0 +1,55 @@
+.TH DICE 1
+.SH NAME
+dice \- roll some (virtual) dice
+.SH SYNOPSIS
+.B dice
+[\fB\-h\fR | \fB\-\-help\fR]
+[\fB\-l\fR | \fB\-\-line\fR]
+[\fB\-v\fR | \fB\-\-verbose\fR]
+[\fIN\fRx]
+\fIM\fRd\fIS\fR+\fIA\fR
+.SH DESCRIPTION
+.B dice
+generates a set of random results according to a distribution given in RPG notation.
+The specification is \fBNxMdS+A\fR which says to roll \fBM\fR \fBS\fR-sided dice,
+sum the results and add \fBA\fR, and to do it \fBN\fR times.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Print a usage message an exit.
+.TP
+.BR \-l ", " \-\-line
+Print one value per line.
+.TP
+.BR \-v ", " \-\-verbose
+Print verbose debugging output.
+.TP
+.BR N"x"
+Generate \fBN\fR sets of results.
+.TP
+.BR MdS+A
+Sum the results of \fBM\fR \fBS\fR-sided dice and add \fBA\fR.
+The default is "1x 1d6+0" which is to generate a number between 1 and 6,
+inclusive.
+.SH EXAMPLES
+.PP
+.nf
+dice 6x 3d6
+12 11 4 9 15 11
+.fi
+.PP
+.nf
+dice 2d10
+9
+.fi
+.PP
+.nf
+dice 10x 1d100
+47 96 80 99 72 80 40 60 73 55
+.fi
+.SH BUGS
+.PP
+Not separating "Nx" and "MdS+A" results in "Nx1d6".
+A single number argument is not interpreted correctly and it falls back to the
+default of "1x 1d6+0".
+The minimum reliable expression is "MdS".

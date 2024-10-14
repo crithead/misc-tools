@@ -1,0 +1,41 @@
+.TH PRIMES 1
+.SH NAME
+primes \- print prime numbers or factors
+.SH SYNOPSIS
+.B primes
+[\fB\-\-help\fR]
+[\fB\-\-factor\fR \fIN\fR]
+\fIMIN\fR
+\fIMAX\fR
+.SH DESCRIPTION
+.B primes
+Calculate and print the primes numbers from \fBMIN\fR to \fBMAX\fR.
+Alternatively, calculate the prime factorization of a number.
+.SH OPTIONS
+.TP
+.BR \-\-help
+Print a usage message an exit.
+.TP
+.BR \-\-factor
+Calculate the prime factors of a number.
+.TP
+.BR MIN
+ The minimum of the range to display primes numbers from.
+.TP
+.BR MAX
+ The maximum of the range to display primes numbers from.
+.SH EXAMPLES
+.PP
+.nf
+primes 100 200
+     101     103     107     109     113     127     131     137     139     149     151     157     163     167     173     179     181     191     193     197     199
+.fi
+.PP
+.nf
+primes --factor 9782
+9782:        2      67      73
+.fi
+.SH BUGS
+.PP
+ It only factor one number, others are ignored.
+ There are no defaults for MIN or MAX.

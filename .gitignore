@@ -60,9 +60,9 @@ target/
 *.swp
 
 # Documentation
-*.1.html
-*.1.pdf
-*.1
+misc/*.1.html
+misc/*.1.pdf
+misc/*.1
 
 # Coinflip
 coinflip/*.plot
