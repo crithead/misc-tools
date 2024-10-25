@@ -1,0 +1,12 @@
+[Unit]
+Description=An example service that doesn't really do much of anything.
+After=network.target
+
+[Service]
+PrivateTmp=true
+Type=forking
+PIDFile=/var/run/%I.pid
+ExecStart=/usr/sbin/headcritd --daemon --writepid /var/run/%I.pid --config /etc/%I.conf
+
+[Install]
+WantedBy=multi-user.target

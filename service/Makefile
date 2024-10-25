@@ -2,6 +2,7 @@ EXEC = templated
 CFLAGS += -Wall -Werror -std=c17
 
 SOURCES := service.c
+SOURCES += log.c
 SOURCES += message.c
 SOURCES += options.c
 

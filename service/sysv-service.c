@@ -1,13 +1,10 @@
 /**
- * A generic Linux New Style daemon.
- *
- * Features:
- * - SIGTERM: exit cleanly
- * - SIGHUP - reload configo
- * - Call sd_notify(3) appropriately
+ * A generic service.
  */
 
-#include <systemd/sd-daemon.h>
+/* Required for daemon(3) */
+#define _DEFAULT_SOURCE
+
 #include <errno.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -16,7 +13,6 @@
 #include <syslog.h>
 #include <unistd.h>
 
-#include "log.h"
 #include "message.h"
 #include "options.h"
 #include "service.h"
@@ -64,44 +60,53 @@ int main( int argc, char **argv)
         return 0;
     }
 
-    openlog("SVC", LOG_PID, LOG_USER);
-
-
-    write_pid_file(PID_FILE);
-
-
-    /* Install SIG handlers for INT, TERM, USR1, USR2 */
-    struct sigaction sigact = {0};
-    sigact.sa_handler = signal_handler;
-    sigact.sa_flags = 0;
-
-    if (sigaction(SIGTERM, &sigact, NULL) < 0) {
-        emergency("Sigaction: %s", strerror(errno));
+    /* Daemonize */
+    if (daemon(0, 0) < 0) {
+        openlog("SVC", LOG_PID, LOG_USER);
+        syslog(LOG_CRIT, "Daemonization failed: %s", strerror(errno));
+        closelog();
         return 1;
     }
 
+    openlog("SVC", LOG_PID, LOG_USER);
+    write_pid_file(PID_FILE);
+
+
+    /* Install SIG handlers for INT, USR1, USR1 */
+#if 0
+    struct sigaction sigact = {
+        .sa_handler = signal_handler,
+        .sa_sigaction = NULL,
+        .sa_mask = 0,
+        .sa_flags = 0
+    };
+#else
+    struct sigaction sigact = {0};
+    sigact.sa_handler = signal_handler;
+    sigact.sa_flags = 0;
+#endif
+
     if (sigaction(SIGINT, &sigact, NULL) < 0) {
-        emergency("Sigaction: %s", strerror(errno));
+        syslog(LOG_EMERG, "Sigaction: %s", strerror(errno));
         return 1;
     }
 
     if (sigaction(SIGHUP, &sigact, NULL) < 0) {
-        emergency("Sigaction: %s", strerror(errno));
+        syslog(LOG_EMERG, "Sigaction: %s", strerror(errno));
         return 1;
     }
 
     if (sigaction(SIGUSR1, &sigact, NULL) < 0) {
-        emergency("Sigaction: %s", strerror(errno));
+        syslog(LOG_EMERG, "Sigaction: %s", strerror(errno));
         return 1;
     }
 
     if (sigaction(SIGUSR2, &sigact, NULL) < 0) {
-        emergency("Sigaction: %s", strerror(errno));
+        syslog(LOG_EMERG, "Sigaction: %s", strerror(errno));
         return 1;
     }
 
-    sd_notify(0, "READY=1");
-    notice("Online");
+    syslog(LOG_NOTICE, "Online");
 
     /* Perform a "service" */
     int service_up = true;
@@ -111,29 +116,26 @@ int main( int argc, char **argv)
         if (value < 0) {
             switch (current_request) {
                 case SVC_RELOAD:
-                    sd_notify(0, "RELOADING=1");
                     reload();
-                    sd_notify(0, "READY=1");
                     break;
                 case SVC_STATS:
                     dump_stats();
                     break;
                 case SVC_STOP:
                     service_up = false;
-                    sd_notify(0, "STOPPING=1");
-                    debug("Received SIGINT, shutting down");
+                    syslog(LOG_DEBUG, "Received SIGINT, shutting down");
                     break;
                 default:
                     break;
             }
         } else {
-            debug("pause returned %d", value);
+            syslog(LOG_DEBUG, "pause returned %d", value);
         }
     }
 
     remove_pid_file(PID_FILE);
-    notice("Offline");
-    sd_notify(0, "EXIT_STATUS=0");
+    syslog(LOG_NOTICE, "Offline");
+    closelog();
 
     return 0;
 }

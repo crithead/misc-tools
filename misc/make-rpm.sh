@@ -1,6 +1,9 @@
 #!/bin/bash
-readonly PROJECT=${1:-example}
-readonly VERSION=${2:-"0.1.1"}
+# Build an RPM for the headcrit service daemon.
+# Run this script from the root of the `misc-tools` repository.
+readonly PROJECT=${1:-headcrit}
+readonly VERSION=${2:-"0.1.2"}
+readonly ARCHIVE=${PROJECT}-${VERSION}.tar.gz
 HOME=/work
 
 # Create rpmbuild tree, if it does not already exist
@@ -8,13 +11,31 @@ if [[ ! -d $HOME/rpmbuild ]]; then
     rpmdev-setuptree
 fi
 
-cd $HOME/rpmbuild
+# Create the archive of files to install
+make -C service
+readonly TAR_TMP=$(mktemp --directory --tmpdir hcd-XXXXXXXX)/${PROJECT}-${VERSION}
+mkdir -p ${TAR_TMP}
+cp -f service/templated ${TAR_TMP}/headcritd
+strip ${TAR_TMP}/headcritd
+cp -f man/headcritd.8 ${TAR_TMP}
+gzip ${TAR_TMP}/headcritd.8
+cp -f misc/headcritd.service ${TAR_TMP}
+
+pushd ${TAR_TMP}/.. > /dev/null
+tar czf ${ARCHIVE} ${PROJECT}-${VERSION}
+popd > /dev/null
+mv ${TAR_TMP}/${ARCHIVE} $HOME/rpmbuild/SOURCES
+rm -fr ${TAR_TMP}
+cpi-f misc/${PROJECT}.spec $HOME/rpmbuild/SPECS
+
+# Change to RPM Build directory
+ pushd $HOME/rpmbuild > /dev/null
 
 # Add macros
 echo "%_sourcedir %{_topdir}/SOURCES" >> $HOME/.rpmmacros
 
 # Create a spec file, if one does not already exists
-if [[ ! -f SPECS/$PROJECT.spec ]]; then
+if [[ ! -f SPECS/${PROJECT}.spec ]]; then
     rpmdev-newspec --output SPECS/${PROJECT}.spec ${PROJECT}
     sed -e "s/Name:.*$/Name:           ${PROJECT}/" \
         -e "s/Version:.*$/Version:        ${VERSION}/" \
@@ -28,7 +49,7 @@ if [[ ! -f SPECS/$PROJECT.spec ]]; then
 fi
 
 # There is a lot that must be done to get a properly working spec file.
-# See `misc/dice.spec`
+# See `misc/example.spec`
 
 # The archive it will build from must be named `%{name}-%{version}.tar.gz`
 # and contains the files to be installed.  They are all in the top level
@@ -43,6 +64,11 @@ fi
 
 # Build the rpm
 rpmbuild -bb SPECS/${PROJECT}.spec
+
+popd > /dev/null
+
+# Copy the result to HOME
+#cp -f $HOME/rpmbuild/BUILD/.../${PROJECT}-${VERSION}-1.el9.x86_64.rpm $HOME
 
 exit 0
 
