@@ -1,0 +1,79 @@
+.TH CREATE-INDEX 1 "November 2024" "Utiltity Commands"
+.SH NAME
+create-index \- generate an index.html file for a directory
+.SH SYNOPSIS
+.B create-index
+[ \fIOPTIONS\fR ]
+.SH DESCRIPTION
+Generate an HTML index file in a directory for the files therein.
+.PP
+The "create" version of the program has options while the "make" version
+has none.
+The
+.B --create-style-sheet
+writes the default CSS file to the specified directory.
+.SH OPTIONS
+.TP
+.BR \-h ", " \-\-help
+Print a summary of options and exit.
+.TP
+.BR \-c " " \fINUMCOLS\fR ", " \-\-columns " " \fINUMCOLS\fR
+Format output in \fINUMCOLS\fR columns (currently limited to 1 or 2).
+The default is 2.
+.TP
+.BR \-d " " \fIDIRECTORY\fR ", " \-\-directory " " \fIDIRECTORY\fR
+Directory to list (default: CWD)
+.TP
+.BR \-s " " \fISTYLESHEET\fR ", " \-\-style-sheet " " \fISTYLE_SHEET\fR
+The name of the CSS file to include in the output \fBindex.html\fR file.
+The default is \fIindex.css\fR.
+.TP
+.BR \-t " " \fITITLE\fR ", " \-\-title " " \fITITLE\fR
+Set the page title to \fITITLE\fR.
+The default is to use the directory name.
+.TP
+.BR \-v ", " \-\-verbose
+Enable processing messages.
+.TP
+.BR \-\-create-style-sheet
+Writes a default style sheet to the output directory.
+.TP
+.BR \-\-html-only
+List only HTML files.
+.TP
+.BR \-\-only-files
+List only files. Ignore directories, symlinks, etc.
+.TP
+.BR \-\-show-dots
+Show \fB.\fR and \fB..\fR in listing
+.TP
+.BR \-\-show-index
+Show index.html and index.css in listing
+.SH EXIT STATUS
+Returns zero if successful and non-zero if an error occurred.
+Any non-zero return status indicates an index file was not produced.
+A status of
+.B 1
+indicates the program printed the help message.
+A status of
+.B 2
+indicates the specified directory cannot be opened.
+A status of
+.B 3
+indicates an I/O Error.
+.SH EXAMPLES
+.PP
+Print a moderately helpful usage message.
+.nf
+create-index --help
+.fi
+.PP
+Create an index file and a CSS file of the HTML files in the current directory.
+.nf
+create-index --create-style-sheet --html-only --title "Index of This Directory"
+.fi
+.SH BUGS
+TBA
+.SH SEE ALSO
+make-index(1)
+
