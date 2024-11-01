@@ -1,0 +1,28 @@
+.TH GRAYSCALE 1 2024-10-31 "Utility Commands"
+.SH NAME
+grayscale \- convert an RGB value into a grey scale value
+.SH SYNOPSIS
+.B grayscale
+\fIR\fR
+\fIG\fR
+\fIB\fR
+.SH DESCRIPTION
+.B greyscale
+prints the grey scale number for R, G, and B of an RGB value passed in on the
+command line.  The program outputs values from four conversion algorithms.
+.PP
+.B Lightness
+is the average of the largest and smallest of the values.
+.PP
+.B Average
+is the mean of the three values.
+.PP
+.B Luminosity
+is a weighted average of the three values.
+.PP
+.B Brightness
+is a different weighted average of the three values.
+.SH EXIT STATUS
+Returns zero if the input is successfully converted, otherwise it returns 1
+to indicate an error occurred.
+
