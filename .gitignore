@@ -146,6 +146,8 @@ doc/html
 doc/latex
 doc/doxygen.log
 
+mnt/mounter
+
 misc/errno
 
 # service
