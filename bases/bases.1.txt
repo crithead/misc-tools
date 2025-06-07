@@ -1,0 +1,126 @@
+BASES(1)
+========
+:doctype: manpage
+
+NAME
+----
+bases - print numbers in multiple bases
+
+
+SYNOPSIS
+--------
+*bases* ['OPTIONS'] 'N' ...
+
+DESCRIPTION
+-----------
+Print integer numbers from the command line in multiple bases: hexadecimal,
+decimal, octal, and (optionally) binary.  Numbers and flags on the command
+line are processed in order and produce one line of output per input value.
+
+The default input is decimal (base 10).  Hexadecimal input numbers can be
+prefixed with ``0x'' or postfixed with ``h'' or ``H''. Octal input numbers
+can be prefixed with "0" or postfixed with ``O'' or ``o'' (the letter 'O').
+Binary input numbers must be postfixed with ``b'' or ``B''.
+
+Command line options [bdho] can be used to force interpretation of the
+arguments that follow.  Prefixes and postfixes on input will be ignored.
+
+Non-digit separators in the input values are ignored.
+
+*bases* --help | -a | -{bdhno} N ...
+
+OPTIONS
+-------
+
+*--help*::
+    Print a summary of options and exit.
+
+*-a*::
+    Enable all output types (adds binary output).
+
+*-b*::
+    Force following args to be interpreted as binary.
+
+*-d*::
+    Force following args to be interpreted as decimal.
+
+*-h*::
+    Force following args to be interpreted as hexidecimal.
+
+*-n*::
+    Unset the force flag.
+
+*-o*::
+    Force following args to be interpreted as octal.
+
+
+EXIT STATUS
+-----------
+*0*::
+    The program always returns 0.
+
+
+EXAMPLES
+--------
+
+Print a moderately helpful usage message.
+..............................................................................
+bases --help
+..............................................................................
+
+Print the decimal number 100 in hexadecimal, decimal, and octal.
+..............................................................................
+
+bases 100
+..............................................................................
+
+Print the decimal number 100 in hexadecimal, decimal, octal, and binary.
+
+..............................................................................
+bases -a 100
+..............................................................................
+
+Print the binary number 101, the octal number 101, the decimal number 101 and
+the hexadecimal number 101.
+Output is hexadecimal, decimal, and octal.
+
+..............................................................................
+bases 101b 101o 101 101h
+..............................................................................
+
+Print the hexadecimal numbers 10 and 100, the decimal numbers 10 and 100, the
+octal numbers 10 and 101, and the binary numbers 10 and 101.
+Output is hexadecimal, decimal, and octal.
+
+..............................................................................
+bases -h 10 100 -d 10 100 -o 10 100 -b 10 100
+..............................................................................
+
+Print the numbers, ignoring non-digit seprators.
+
+..............................................................................
+bases 1101:1001b ABCD:E123h 1,000,000
+..............................................................................
+
+
+BUGS
+----
+Binary input with a leading zero is interpreted as octal even when the 'b'
+postfix is present.
+
+Number size is limited to 32-bit signed integers.
+
+Bad input is converted to bad output.
+
+
+COPYRIGHT
+---------
+(C) 2014 Donald Perkovich. All rights reserved.
+
+// a2x: --doctype manpage
+// a2x: --format manpage
+// a2x: --no-xmllint
+// a2x: --dblatex-opts "-P latex.output.revhistory=0"
+// build command:
+//   a2x --doctype manpage --format manpage bases.1.txt
+

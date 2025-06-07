@@ -1,0 +1,23 @@
+#!/usr/bin/env python3
+
+
+def main():
+    print('Testing "bases" ...')
+    # TODO Put tests here
+    print('Done')
+
+##############################################################################
+if __name__ == '__main__':
+    exit_code = -1
+    try:
+        main()
+        exit_code = 0
+    except KeyboardInterrupt as e:
+        print( e )
+        exit_code = 2
+    except Exception as e:
+        print( e )
+        exit_code = 1
+    finally:
+        exit( exit_code )
+
