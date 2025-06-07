@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# Makefile generator for Problems
+#
+MAKEFILE=Makefile
+
+CFLAGS="-Wall -Wpedantic --std=c11"
+
+CFILES=$(ls *.c)
+
+BINDIR="bin"
+
+PROGS=
+for file in $CFILES;  do
+    PROGS="$PROGS $(basename $file .c)"
+done
+
+if [ -e $MAKEFILE ]; then
+    rm -f $MAKEFILE
+fi
+
+echo "# Generated Makefile for Problems" > $MAKEFILE
+echo "" >> $MAKEFILE
+echo "BIN = $BINDIR" >> $MAKEFILE
+echo "" >> $MAKEFILE
+echo "all:$PROGS" >> $MAKEFILE
+echo "" >> $MAKEFILE
+echo "$BINDIR:" >> $MAKEFILE
+echo "	mkdir -p $BINDIR" >> $MAKEFILE
+echo "" >> $MAKEFILE
+
+for file in $CFILES; do
+    prog=$(basename $file .c)
+    echo "$prog: $file | $BINDIR" >> $MAKEFILE
+    echo "	gcc $CFLAGS -o \$(BIN)/$prog $file -lm" >> $MAKEFILE
+    echo "" >> $MAKEFILE
+done
+
+echo ".PHONY: clean" >> $MAKEFILE
+echo "clean:" >> $MAKEFILE
+echo "	rm -fr $BINDIR" >> $MAKEFILE
+echo "" >> $MAKEFILE
+
