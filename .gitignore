@@ -65,6 +65,10 @@ target/
 *.1.pdf
 *.1
 
+# Cacth2
+catch2/program
+catch2/tester
+
 # Coinflip
 coinflip/*.plot
 coinflip/*.data
