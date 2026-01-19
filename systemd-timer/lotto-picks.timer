@@ -1,0 +1,9 @@
+[Unit]
+Description=Generate a set of lottery numbers periodically.
+
+[Timer]
+OnCalendar=*-*-* 03:02:01
+
+[Install]
+WantedBy=timers.target
+

@@ -1,0 +1,6 @@
+[Unit]
+Description=Generate lottery picks and send via email.
+
+[Service]
+ExecStart=/home/donp/bin/daily-lottery
+

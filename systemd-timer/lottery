@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+# Lottery Number Picker
+
+import argparse
+import sys
+from random import randint
+
+def get_args():
+    parser = argparse.ArgumentParser(
+        description='Generates sets of lottery numbers',
+        epilog='')
+    parser.add_argument('-n', '--number', action='store', default=1, type=int,
+            help='Number of picks (number sets) to generate')
+    parser.add_argument('-m', '--mega-millions', action='store_true',
+            default=False,
+            help='Generate Mega Millions numbers')
+    parser.add_argument('-p', '--powerball', action='store_true',
+            default=False,
+            help='Generate Powerball numbers')
+    parser.add_argument('-s', '--ca-super-lotto', action='store_true',
+            default=False,
+            help='Generate CA Supper Lotto Plus numbers')
+    parser.add_argument('-v', '--verbose', action='store_true', default=False,
+            help='Enable debugging messages')
+    return parser.parse_args()
+
+
+messages_on = False
+
+def msg(*args):
+    global messages_on
+    if messages_on:
+        print(*args)
+
+
+def prepare_random():
+    m = 0
+    n = randint(1000, 9999)
+    for i in range(n):
+        m += randint(1000, 9999)
+
+
+def generate_ca_super_lotto():
+    CASL_COUNT = 5
+    CASL_NUMBER = 47
+    CASL_BONUS = 27
+    numbers = set()
+
+    numbers.add(randint(1, CASL_NUMBER))
+    numbers.add(randint(1, CASL_NUMBER))
+    numbers.add(randint(1, CASL_NUMBER))
+    numbers.add(randint(1, CASL_NUMBER))
+    numbers.add(randint(1, CASL_NUMBER))
+    while len(numbers) < CASL_COUNT:
+        numbers.add(randint(1, CASL_NUMBER))
+    bonus = str(randint(1, CASL_BONUS))
+
+    for n in sorted(numbers):
+        print('{:2}'.format(n), end=', ')
+    print(f'+{bonus}')
+
+
+def generate_powerball():
+    PB_COUNT = 5
+    PB_NUMBER = 69
+    PB_BONUS = 26
+    numbers = set()
+
+    numbers.add(randint(1, PB_NUMBER))
+    numbers.add(randint(1, PB_NUMBER))
+    numbers.add(randint(1, PB_NUMBER))
+    numbers.add(randint(1, PB_NUMBER))
+    numbers.add(randint(1, PB_NUMBER))
+    while len(numbers) < PB_COUNT:
+        numbers.add(randint(1, PB_NUMBER))
+    bonus = str(randint(1, PB_BONUS))
+
+    for n in sorted(numbers):
+        print('{:2}'.format(n), end=', ')
+    print(f'+{bonus}')
+
+
+def generate_mega_millions():
+
+    MM_COUNT = 5
+    MM_NUMBER = 70
+    MM_BONUS = 25
+    numbers = set()
+
+    numbers.add(randint(1, MM_NUMBER))
+    numbers.add(randint(1, MM_NUMBER))
+    numbers.add(randint(1, MM_NUMBER))
+    numbers.add(randint(1, MM_NUMBER))
+    numbers.add(randint(1, MM_NUMBER))
+    while len(numbers) < MM_COUNT:
+        numbers.add(randint(1, MM_NUMBER))
+
+    bonus = str(randint(1, MM_BONUS))
+
+    for n in sorted(numbers):
+        print('{:2}'.format(n), end=', ')
+    print(f'+{bonus}')
+
+
+def main(args):
+    prepare_random()
+
+    if args.ca_super_lotto:
+        print('CA Super Lotto Plus')
+        for i in range(args.number):
+            generate_ca_super_lotto()
+    if args.powerball:
+        print('Powerball')
+        for i in range(args.number):
+            generate_powerball()
+    if args.mega_millions:
+        print('Mega Millions')
+        for i in range(args.number):
+            generate_mega_millions()
+
+
+if __name__ == '__main__':
+    try:
+        args = get_args()
+        if args.verbose:
+            messages_on = True;
+        main(args)
+    except Exception as e:
+        print(e)
+

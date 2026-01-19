@@ -1,0 +1,9 @@
+#! /bin/bash
+# Generate daily lottery numbers
+readonly FILE="$(mktemp --tmpdir daily-lottery.XXXXXXXX)"
+
+"${HOME}/bin/lottery" -mps > "${FILE}"
+/usr/bin/mutt -s "Daily Lottery Picks" -- "${USER}" < "${FILE}"
+/usr/bin/rm -f "${FILE}"
+exit 0
+
