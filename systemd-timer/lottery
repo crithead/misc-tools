@@ -46,11 +46,6 @@ def generate_ca_super_lotto():
     CASL_BONUS = 27
     numbers = set()
 
-    numbers.add(randint(1, CASL_NUMBER))
-    numbers.add(randint(1, CASL_NUMBER))
-    numbers.add(randint(1, CASL_NUMBER))
-    numbers.add(randint(1, CASL_NUMBER))
-    numbers.add(randint(1, CASL_NUMBER))
     while len(numbers) < CASL_COUNT:
         numbers.add(randint(1, CASL_NUMBER))
     bonus = str(randint(1, CASL_BONUS))
@@ -66,11 +61,6 @@ def generate_powerball():
     PB_BONUS = 26
     numbers = set()
 
-    numbers.add(randint(1, PB_NUMBER))
-    numbers.add(randint(1, PB_NUMBER))
-    numbers.add(randint(1, PB_NUMBER))
-    numbers.add(randint(1, PB_NUMBER))
-    numbers.add(randint(1, PB_NUMBER))
     while len(numbers) < PB_COUNT:
         numbers.add(randint(1, PB_NUMBER))
     bonus = str(randint(1, PB_BONUS))
@@ -87,11 +77,6 @@ def generate_mega_millions():
     MM_BONUS = 25
     numbers = set()
 
-    numbers.add(randint(1, MM_NUMBER))
-    numbers.add(randint(1, MM_NUMBER))
-    numbers.add(randint(1, MM_NUMBER))
-    numbers.add(randint(1, MM_NUMBER))
-    numbers.add(randint(1, MM_NUMBER))
     while len(numbers) < MM_COUNT:
         numbers.add(randint(1, MM_NUMBER))
 
