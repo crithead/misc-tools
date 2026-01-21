@@ -2,5 +2,5 @@
 Description=Generate lottery picks and send via email.
 
 [Service]
-ExecStart=/home/donp/bin/daily-lottery
+ExecStart=/home/gene/bin/daily-lottery
 
