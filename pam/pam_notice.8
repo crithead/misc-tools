@@ -1,0 +1,91 @@
+'\" t
+.\"     Title: pam_notice
+.\"    Author: [Copied from pam_warn.8]
+.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
+.\"      Date: 11/25/2020
+.\"    Manual: Linux-PAM Manual
+.\"    Source: Linux-PAM Manual
+.\"  Language: English
+.\"
+.TH "PAM_NOTICE" "8" "2026/02/16" "Linux-PAM Manual" "Linux\-PAM Manual"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+pam_notice \- PAM module which logs all module option arguments
+.SH "SYNOPSIS"
+.HP \w'\fBpam_notice\&.so\fR\ 'u
+\fBpam_notice\&.so\fR
+[ \fIOPTIONS\fR ]
+
+.SH "DESCRIPTION"
+.PP
+pam_notice is a PAM module that logs the optional arguments in the program's
+PAM file to \fBsyslog\fR(3)\&. The module always returns \fBPAM_IGNORE\fR,
+indicating that it does not want to affect the authentication process\&.
+.SH "OPTIONS"
+.PP
+This module accepts all options which it writes to \fBsyslog\fR(3)\&.
+.SH "MODULE TYPES PROVIDED"
+.PP
+The
+\fBauth\fR,
+\fBaccount\fR,
+\fBpassword\fR
+and
+\fBsession\fR
+module types are provided\&.
+.SH "RETURN VALUES"
+.PP
+PAM_IGNORE
+.RS 4
+This module always returns PAM_IGNORE\&.
+.RE
+.SH "EXAMPLES"
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+#%PAM\-1\&.0
+# PAM "other" policy for unconfigured programs\&.
+other auth     required       pam_notice\&.so WARNING Using other policy for authenication
+other auth     required       pam_deny\&.so
+other account  required       pam_notice\&.so WARNING Using other policy for account management
+other account  required       pam_deny\&.so
+other password required       pam_notice\&.so WARNING Using other policy for password management
+other password required       pam_deny\&.so
+other session  required       pam_notice\&.so WARNING Using other policy for session management
+other session  required       pam_deny\&.so
+
+.fi
+.if n \{\
+.RE
+.\}
+.SH "SEE ALSO"
+.PP
+\fBpam.conf\fR(5),
+\fBpam.d\fR(5),
+\fBpam\fR(8)
+.SH "AUTHOR"
+.PP
+\fBpam_notice\fR(8)
+was adapted from the Linux-Pam project's
+\fBpam_warn\fR(8)
+as was this manual\&.
