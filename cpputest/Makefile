@@ -8,6 +8,8 @@ OBJECTS := $(SOURCES:.cpp=.o)
 TEST_SOURCES := test_main.cpp test_math.cpp
 TEST_OBJECTS := $(TEST_SOURCES:.cpp=.o)
 
+all: program tester
+
 program: $(OBJECTS)
 	$(CXX) -o $@ $(OBJECTS)
 

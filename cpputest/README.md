@@ -1,7 +1,16 @@
 # CppUTest Example
 
+Install CppUTest
+
 ```
-make test
+sudo apt install cpputest libcpputest-dev
+```
+
+Build & Run
+
+```
+make all test
 ```
 
 [https://cpputest.github.io/manual.html]
+
