@@ -1,8 +1,11 @@
 # Makefile for C++ Examples
 CC := g++
-CXXFLAGS := -O2 -Wall -Wpedantic -std=c++17
-#CXXFLAGS += -Wextra
+CXXFLAGS := -O2 -Wall -Wpedantic
+CXXFLAGS += -Wextra
+CXXFLAGS += -std=c++17
+ifeq ($(D),1)
 CXXFLAGS += -g
+endif
 
 TARGETS :=
 TARGETS += alpha
@@ -26,6 +29,7 @@ TARGETS += fibonacci
 TARGETS += fileio-char
 TARGETS += fileio-int
 TARGETS += first-unique
+TARGETS += func-timer
 TARGETS += functor
 TARGETS += global-object
 TARGETS += golden-ratio

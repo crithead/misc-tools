@@ -1,0 +1,129 @@
+/// @file socketwriter.cpp
+/// @brief Socket client functions.
+
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include <chrono>
+#include <cstring>
+#include <vector>
+
+#include "socketwriter.hpp"
+#include "helpers.hpp"
+#include "options.hpp"
+#include "textsource.hpp"
+
+static void CloseSockets(std::vector<int>& sockets);
+static std::vector<int> OpenSockets(size_t port, size_t num_sockets);
+static void WriteToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_seconds, size_t delay_msec);
+
+// Start a socket client.
+void SocketWriter(const Options& opts)
+{
+    std::vector<int> sockets;
+
+    try {
+        sockets = OpenSockets(opts.port, opts.num_files);
+        WriteToSockets(sockets, opts.text_file, opts.num_seconds, opts.delay_msec);
+        CloseSockets(sockets);
+    } catch (const std::exception& e) {
+        Err("Error: %s", e.what());
+        CloseSockets(sockets);
+        throw;
+    } catch (...) {
+        Err("Unknown error");
+        CloseSockets(sockets);
+        throw;
+    }
+}
+
+/// @brief Close the sockets.
+/// @param[in] sockets A vector of socket file descriptors.
+static void CloseSockets(std::vector<int>& sockets)
+{
+    for (int fd : sockets) {
+        Msg("Close %d", fd);
+        close(fd);
+    }
+    sockets.clear();
+}
+
+/// @brief Open N socket connections.
+/// @param port
+/// @param num_sockets
+/// @return A vector of open file descriptors.
+static std::vector<int> OpenSockets(size_t port, size_t num_sockets)
+{
+    std::vector<int> sockets;
+    sockets.reserve(num_sockets);
+
+    for (size_t i = 0; i < num_sockets; i++) {
+        int fd = socket(AF_INET, SOCK_STREAM, 0);
+        if (fd == -1) {
+            throw std::runtime_error("socket: " + std::string(strerror(errno)));
+        }
+
+        struct sockaddr_in serv_addr;
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_addr.s_addr = INADDR_ANY;
+        serv_addr.sin_port = htons(port);
+
+        int e = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+        if (e == -1) {
+            close(fd);
+            throw std::runtime_error("connect: port(" + std::to_string(port) + " ): " + std::string(strerror(errno)));
+        }
+
+        sockets.push_back(fd);
+    }
+
+    Msg("Opened %d socket connections to port %d", sockets.size(), port);
+    return sockets;
+}
+
+static void WriteToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_seconds, size_t delay_msec)
+{
+    if (sockets.empty()) {
+        throw std::runtime_error("No sockets!");
+    }
+
+    TextSource text_source(textfile);
+
+    auto start_time = std::chrono::steady_clock::now();
+    auto stop_time = start_time + std::chrono::seconds(num_seconds);
+
+    size_t total_bytes = 0;
+    Msg("Writing to sockets every %zd ms for %zu seconds", delay_msec, num_seconds);
+    while (std::chrono::steady_clock::now() < stop_time) {
+        int idx = 0;
+        int fd = -1;
+
+        std::string line = text_source.GetText();
+        do {
+            // For reasons unknown, a write to idx size-1 causes a SIGPIPE
+            // (according to the Internet) and causes the program termination.
+            // The shell reports a return code of 141 (ENOTRECOVERABLE) or
+            // 128 + 13 (SIGPIPE).  Does not trigger the signal handler.
+            idx = RandInt(0, sockets.size() - 1);
+            fd = sockets[idx];
+        } while (fd == -1);
+
+        Msg("Writing %d bytes to socket %d", line.size(), fd);
+        ssize_t n = send(fd, line.c_str(), line.size(), 0);
+        if (n == -1) {
+            Err("send (%d): %s", fd, strerror(errno));
+        } else if (n < static_cast<ssize_t>(line.size())) {
+            total_bytes += n;
+            Err("Partial write (%d): %d of %d bytes", fd, n, line.size());
+        } else if (n == 0) {
+            Err("Socket %d closed by peer", fd);
+        } else if (n == static_cast<ssize_t>(line.size())) {
+            total_bytes += n;
+        }
+
+        Pause(delay_msec);
+    }
+    Msg("Wrote %zd bytes", total_bytes);
+    Msg("Done writing");
+}
