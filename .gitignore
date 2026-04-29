@@ -160,5 +160,5 @@ umq/server
 umq/relay
 umq/iclient
 umq/iserver
-epoll/reader
-epoll/writer
+socketio/reader
+socketio/writer
