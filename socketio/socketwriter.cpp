@@ -16,7 +16,8 @@
 
 static void CloseSockets(std::vector<int>& sockets);
 static std::vector<int> OpenSockets(size_t port, size_t num_sockets);
-static void WriteToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_seconds, size_t delay_msec);
+static void WriteLinesToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_lines, size_t delay_ms);
+static void WriteDurationToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_seconds, size_t delay_ms);
 
 // Start a socket client.
 void SocketWriter(const Options& opts)
@@ -25,7 +26,11 @@ void SocketWriter(const Options& opts)
 
     try {
         sockets = OpenSockets(opts.port, opts.num_files);
-        WriteToSockets(sockets, opts.text_file, opts.num_seconds, opts.delay_msec);
+        if (opts.lines > 0) {
+            WriteLinesToSockets(sockets, opts.text_file, opts.lines, opts.delay_msec);
+        } else {
+            WriteDurationToSockets(sockets, opts.text_file, opts.num_seconds, opts.delay_msec);
+        }
         CloseSockets(sockets);
     } catch (const std::exception& e) {
         Err("Error: %s", e.what());
@@ -82,7 +87,7 @@ static std::vector<int> OpenSockets(size_t port, size_t num_sockets)
     return sockets;
 }
 
-static void WriteToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_seconds, size_t delay_msec)
+static void WriteDurationToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_seconds, size_t delay_ms)
 {
     if (sockets.empty()) {
         throw std::runtime_error("No sockets!");
@@ -94,7 +99,8 @@ static void WriteToSockets(const std::vector<int>& sockets, const std::string& t
     auto stop_time = start_time + std::chrono::seconds(num_seconds);
 
     size_t total_bytes = 0;
-    Msg("Writing to sockets every %zd ms for %zu seconds", delay_msec, num_seconds);
+    size_t total_lines = 0;
+    Msg("Writing to sockets every %zd ms for %zu seconds", delay_ms, num_seconds);
     while (std::chrono::steady_clock::now() < stop_time) {
         int idx = 0;
         int fd = -1;
@@ -113,17 +119,74 @@ static void WriteToSockets(const std::vector<int>& sockets, const std::string& t
         ssize_t n = send(fd, line.c_str(), line.size(), 0);
         if (n == -1) {
             Err("send (%d): %s", fd, strerror(errno));
-        } else if (n < static_cast<ssize_t>(line.size())) {
-            total_bytes += n;
-            Err("Partial write (%d): %d of %d bytes", fd, n, line.size());
         } else if (n == 0) {
             Err("Socket %d closed by peer", fd);
+        } else if (n < static_cast<ssize_t>(line.size())) {
+            total_lines++;
+            total_bytes += n;
+            Err("Partial write (%d): %d of %d bytes", fd, n, line.size());
         } else if (n == static_cast<ssize_t>(line.size())) {
+            total_lines++;
             total_bytes += n;
         }
 
-        Pause(delay_msec);
+        Pause(delay_ms);
     }
-    Msg("Wrote %zd bytes", total_bytes);
+
+    const auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).count();
+    PrintSummary(total_bytes, total_lines, duration_ms);
+
+    Msg("Done writing");
+}
+
+static void WriteLinesToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_lines, size_t delay_ms)
+{
+    if (sockets.empty()) {
+        throw std::runtime_error("No sockets!");
+    }
+
+    TextSource text_source(textfile);
+
+    const auto start_time = std::chrono::steady_clock::now();
+
+    size_t total_bytes = 0;
+    size_t total_lines = 0;
+    Msg("Writing %zu lines to sockets every %zd ms", num_lines, delay_ms);
+    while (total_lines < num_lines) {
+        int idx = 0;
+        int fd = -1;
+
+        std::string line = text_source.GetText();
+        do {
+            // For reasons unknown, a write to idx size-1 causes a SIGPIPE
+            // (according to the Internet) and causes the program termination.
+            // The shell reports a return code of 141 (ENOTRECOVERABLE) or
+            // 128 + 13 (SIGPIPE).  Does not trigger the signal handler.
+            idx = RandInt(0, sockets.size() - 1);
+            fd = sockets[idx];
+        } while (fd == -1);
+
+        Msg("Writing %d bytes to socket %d", line.size(), fd);
+        ssize_t n = send(fd, line.c_str(), line.size(), 0);
+        if (n == -1) {
+            Err("send (%d): %s", fd, strerror(errno));
+        } else if (n == 0) {
+            Err("Socket %d closed by peer", fd);
+        } else if (n < static_cast<ssize_t>(line.size())) {
+            total_lines++;
+            total_bytes += n;
+            Err("Partial write (%d): %d of %d bytes", fd, n, line.size());
+        } else if (n == static_cast<ssize_t>(line.size())) {
+            total_lines++;
+            total_bytes += n;
+        }
+
+        Pause(delay_ms);
+    }
+
+    const auto stop_time = std::chrono::steady_clock::now();
+    const auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop_time - start_time).count();
+    PrintSummary(total_bytes, total_lines, duration_ms);
+
     Msg("Done writing");
 }

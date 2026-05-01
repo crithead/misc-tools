@@ -201,6 +201,7 @@ static void PrintOptions(const Options& opts)
             << "  -h  print_usage  : " << (opts.print_usage ? "true" : "false") << std::endl
             << "  -v  verbose      : " << (opts.verbose ? "true" : "false") << std::endl
             << "  -D  delay_msec   : " << opts.delay_msec << std::endl
+            << "  -l  lines        : " << opts.lines << std::endl
             << "  -n  num_files    : " << opts.num_files << std::endl
             << "  -s  num_seconds  : " << opts.num_seconds << std::endl
             << "  -P  partition    : " << opts.partition << std::endl
@@ -223,16 +224,23 @@ static void PrintUsage(void)
         "\n"
         "    writer -n 100 -P 16 -s 90 -w 10 -t /tmp/input.txt\n"
         "\n"
-        "Socket Writer (enabled if port is non-zero):  Open N socket connections\n"
+        "Socket Writer (enabled if port is non-zero): Open N socket connections\n"
         "to the server at port P, then write to one connection chosen at random every D\n"
         "milliseconds for S seconds.\n"
         "\n"
         "    writer -n 100 -s 60 -p 2025 -D 100 -t /tmp/input.txt\n"
         "\n"
+        "If the value of lines is non-zero, write N lines of text instead of writing\n"
+        "for a number of seconds. For example: write 1 million lines of text with a\n"
+        "delay of 0 ms.\n"
+        "\n"
+        "    writer -n 100 -l 1M -p 2025 -D 0 -t /tmp/input.txt\n"
+        "\n"
         "Options:\n"
         "  -h, --help               Print this help message and exit\n"
         "  -v, --verbose            Enable extra messages\n"
         "  -D, --delay N            Average delay between writes in milliseconds (default: 10)\n"
+        "  -l, --lines N            Number of lines to write (default: 0)\n"
         "  -n, --number-of-files N  Number of files to create or socket connections to open (default: 128)\n"
         "  -P, --partition N        Max number of files per directory (default: 256)\n"
         "  -p, --port P             Port number for socket connections (default: 0)\n"

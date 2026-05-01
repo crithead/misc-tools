@@ -210,6 +210,7 @@ void SocketServerEpoll(const Options& opts)
     auto stop_time = start_time + std::chrono::seconds(opts.num_seconds);
 
     size_t total_bytes = 0;
+    size_t total_lines = 0;
 
     while (std::chrono::steady_clock::now() < stop_time) {
         struct epoll_event events[MAX_EVENTS] = {0};
@@ -234,6 +235,7 @@ void SocketServerEpoll(const Options& opts)
                     CloseConnection(epoll_fd, events[i].data.fd, connections);
                 } else {
                     try {
+                        total_lines++;
                         total_bytes += ReadFromConnection(events[i].data.fd);
                     } catch (const no_data_exception&) {
                         CloseConnection(epoll_fd, events[i].data.fd, connections);
@@ -246,7 +248,8 @@ void SocketServerEpoll(const Options& opts)
         } // else n == 0 -> timed out
     }
 
-    Msg("Read %zu bytes", total_bytes);
+    auto duration_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start_time).count();
+    PrintSummary(total_bytes, total_lines, duration_ms);
 
     for (int fd : connections) {
         Msg("Close connection (%d)", fd);

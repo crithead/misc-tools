@@ -85,6 +85,29 @@ void Pause(size_t milliseconds)
     }
 }
 
+// Print a summary of data processed.
+void PrintSummary(size_t bytes, size_t lines, size_t milliseconds)
+{
+    size_t minutes = 0;
+    size_t seconds = 0;
+    if (milliseconds >= 60000) {
+        minutes = milliseconds / 60000;
+        milliseconds = milliseconds % 60000;
+    }
+    if (milliseconds >= 1000) {
+        seconds = milliseconds / 1000;
+        milliseconds = milliseconds % 1000;
+    }
+
+    if (minutes > 0) {
+        std::cout << "Processed " << bytes << " bytes in " << lines << " lines for " << minutes << "m " << seconds << "s " << milliseconds << "ms" << std::endl;
+    } else if (seconds > 0) {
+        std::cout << "Processed " << bytes << " bytes in " << lines << " lines for " << seconds << "s " << milliseconds << "ms" << std::endl;
+    } else {
+        std::cout << "Processed " << bytes << " bytes in " << lines << " lines for " << milliseconds << "ms" << std::endl;
+    }
+}
+
 // Generate a random integer.
 int RandInt(int a, int b)
 {

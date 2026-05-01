@@ -34,6 +34,12 @@ extern void Err(const char *fmt, ...);
 /// @param milliseconds Number of milliseconds to sleep.
 extern void Pause(size_t milliseconds);
 
+/// @brief Print a summary of data processed.
+/// @param bytes Number of bytes
+/// @param lines Number of lines
+/// @param milliseconds Number of milliseconds
+extern void PrintSummary(size_t bytes, size_t lines, size_t milliseconds);
+
 /// @brief Get a random integer in [a, b].
 /// @param a The minimum value.
 /// @param b The maximum value.

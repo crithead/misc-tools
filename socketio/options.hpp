@@ -26,6 +26,9 @@ class Options
     static const size_t DEFAULT_DELAY_MSEC;
     static const size_t MIN_DELAY;
     static const size_t MAX_DELAY;
+    static const size_t DEFAULT_LINES;
+    static const size_t MIN_LINES;
+    static const size_t MAX_LINES;
     static const size_t DEFAULT_PARTITION;
     static const size_t MIN_PARTITION;
     static const size_t MAX_PARTITION;
@@ -44,6 +47,7 @@ class Options
     bool print_usage;
     bool verbose;
     size_t delay_msec;
+    size_t lines;
     size_t num_files;
     size_t num_seconds;
     size_t partition;
