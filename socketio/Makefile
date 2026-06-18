@@ -1,5 +1,6 @@
 CC = g++
 CPPFLAGS += -Wall -Werror -std=c++17
+#CPPFLAGS += -Wextra
 
 ifeq ($(V), 1)
 E =

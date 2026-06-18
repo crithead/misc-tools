@@ -126,14 +126,14 @@ static std::vector<std::ifstream> OpenFiles(const std::string& base_dir)
 static void PrintOptions(const Options& opts)
 {
     if (opts.verbose) {
-        std::cout << "Options:" << std::endl
-            << "  -h  print_usage : " << (opts.print_usage ? "true" : "false") << std::endl
-            << "  -v  verbose     : " << (opts.verbose ? "true" : "false") << std::endl
-            << "  -n  num_files   : " << opts.num_files << std::endl
-            << "  -s  num_seconds : " << opts.num_seconds << std::endl
-            << "  -p  port        : " << opts.port << std::endl
-            << "  -W  wait_method : " << opts.wait_method << std::endl
-            << "  -d  base_dir    : " << opts.base_dir << std::endl
+        std::cout << "Options:" << '\n'
+            << "  -h  print_usage : " << (opts.print_usage ? "true" : "false") << '\n'
+            << "  -v  verbose     : " << (opts.verbose ? "true" : "false") << '\n'
+            << "  -n  num_files   : " << opts.num_files << '\n'
+            << "  -s  num_seconds : " << opts.num_seconds << '\n'
+            << "  -p  port        : " << opts.port << '\n'
+            << "  -W  wait_method : " << opts.wait_method << '\n'
+            << "  -d  base_dir    : " << opts.base_dir << '\n'
             << std::endl;
     }
 }
@@ -161,7 +161,8 @@ static void PrintUsage(void)
     std::cout << USAGE << std::endl;
 }
 
-static void ReadFromFiles(std::vector<std::ifstream>& ifstreams, size_t num_seconds)
+//static void ReadFromFiles(std::vector<std::ifstream>& ifstreams, size_t num_seconds)
+static void ReadFromFiles(std::vector<std::ifstream>&, size_t num_seconds)
 {
     auto start_time = std::chrono::steady_clock::now();
     while (std::chrono::steady_clock::now() - start_time < std::chrono::seconds(num_seconds)) {

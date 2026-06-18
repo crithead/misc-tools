@@ -146,7 +146,8 @@ static size_t ReadFromConnection(int fd)
             Err("recv: %s", strerror(errno));
         }
     } else if (n > 0) {
-        std::cout << '[' << fd << "] " << std::string(rxbuf, n) << std::endl;
+        // TODO Add flag to enable printing received data
+        //std::cout << '[' << fd << "] " << std::string(rxbuf, n) << std::endl;
         value = static_cast<size_t>(n);
     } else {
         throw no_data_exception();

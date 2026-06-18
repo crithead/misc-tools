@@ -52,6 +52,9 @@ const size_t Options::MAX_WAIT_SECONDS = 60;
 const std::string Options::DEFAULT_BASE_DIR = "/tmp/poll";
 
 /// Default text file to read from.
+const std::string Options::DEFAULT_IP_ADDR = "127.0.0.1";
+
+/// Default text file to read from.
 const std::string Options::DEFAULT_TEXT_FILE = "/work/tmp/pg996.txt";
 
 /// Default wait method.
@@ -72,12 +75,14 @@ Options::Options(int argc, char* argv[]) :
     port(DEFAULT_PORT),
     wait_seconds(DEFAULT_WAIT_SECONDS),
     base_dir(DEFAULT_BASE_DIR),
+    ip_addr(DEFAULT_IP_ADDR),
     text_file(DEFAULT_TEXT_FILE),
     wait_method(DEFAULT_WAIT_METHOD)
 {
     static struct option long_options[] = {
         {"help", no_argument, nullptr, 'h'},
         {"verbose", no_argument, nullptr, 'v'},
+        {"address", required_argument, nullptr, 'a'},
         {"delay", required_argument, nullptr, 'D'},
         {"lines", required_argument, nullptr, 'l'},
         {"number-of-files", required_argument, nullptr, 'n'},
@@ -94,13 +99,16 @@ Options::Options(int argc, char* argv[]) :
     extern char *optarg;
 
     int opt;
-    while ((opt = getopt_long(argc, argv, "D:d:hl:n:p:P:s:t:vw:W:", long_options, nullptr)) != -1) {
+    while ((opt = getopt_long(argc, argv, "a:D:d:hl:n:p:P:s:t:vw:W:", long_options, nullptr)) != -1) {
         switch (opt) {
             case 'h':
                 print_usage = true;
                 break;
             case 'v':
                 verbose = true;
+                break;
+            case 'a':
+                ip_addr = optarg;
                 break;
             case 'd':
                 base_dir = optarg;

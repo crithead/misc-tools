@@ -1,6 +1,7 @@
 /// @file socketwriter.cpp
 /// @brief Socket client functions.
 
+#include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -15,7 +16,7 @@
 #include "textsource.hpp"
 
 static void CloseSockets(std::vector<int>& sockets);
-static std::vector<int> OpenSockets(size_t port, size_t num_sockets);
+static std::vector<int> OpenSockets(const std::string& addr, size_t port, size_t num_sockets);
 static void WriteLinesToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_lines, size_t delay_ms);
 static void WriteDurationToSockets(const std::vector<int>& sockets, const std::string& textfile, size_t num_seconds, size_t delay_ms);
 
@@ -25,7 +26,7 @@ void SocketWriter(const Options& opts)
     std::vector<int> sockets;
 
     try {
-        sockets = OpenSockets(opts.port, opts.num_files);
+        sockets = OpenSockets(opts.ip_addr, opts.port, opts.num_files);
         if (opts.lines > 0) {
             WriteLinesToSockets(sockets, opts.text_file, opts.lines, opts.delay_msec);
         } else {
@@ -55,10 +56,11 @@ static void CloseSockets(std::vector<int>& sockets)
 }
 
 /// @brief Open N socket connections.
-/// @param port
-/// @param num_sockets
+/// @param addr Remote IP Address
+/// @param port Remote port
+/// @param num_sockets Number of connections to open to the remote host.
 /// @return A vector of open file descriptors.
-static std::vector<int> OpenSockets(size_t port, size_t num_sockets)
+static std::vector<int> OpenSockets(const std::string& addr, size_t port, size_t num_sockets)
 {
     std::vector<int> sockets;
     sockets.reserve(num_sockets);
@@ -74,7 +76,16 @@ static std::vector<int> OpenSockets(size_t port, size_t num_sockets)
         serv_addr.sin_addr.s_addr = INADDR_ANY;
         serv_addr.sin_port = htons(port);
 
-        int e = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+        int e = inet_pton(AF_INET, addr.c_str(), &(serv_addr.sin_addr));
+        if (e == -1) {
+            close(fd);
+            throw std::runtime_error("inet_pton( " + addr + " ): " + std::string(strerror(errno)));
+        } else if (e == 0) {
+            close(fd);
+            throw std::invalid_argument(addr + " is not a valid network address");
+        }
+
+        e = connect(fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
         if (e == -1) {
             close(fd);
             throw std::runtime_error("connect: port(" + std::to_string(port) + " ): " + std::string(strerror(errno)));
@@ -120,7 +131,7 @@ static void WriteDurationToSockets(const std::vector<int>& sockets, const std::s
         if (n == -1) {
             Err("send (%d): %s", fd, strerror(errno));
         } else if (n == 0) {
-            Err("Socket %d closed by peer", fd);
+            Msg("No data sent (%d)", fd);  // Err or Msg?
         } else if (n < static_cast<ssize_t>(line.size())) {
             total_lines++;
             total_bytes += n;
@@ -171,7 +182,7 @@ static void WriteLinesToSockets(const std::vector<int>& sockets, const std::stri
         if (n == -1) {
             Err("send (%d): %s", fd, strerror(errno));
         } else if (n == 0) {
-            Err("Socket %d closed by peer", fd);
+            Msg("No data sent (%d)", fd);  // Err or Msg?
         } else if (n < static_cast<ssize_t>(line.size())) {
             total_lines++;
             total_bytes += n;

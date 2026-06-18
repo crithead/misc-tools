@@ -197,18 +197,19 @@ static void HandleSignals(void)
 static void PrintOptions(const Options& opts)
 {
     if (opts.verbose) {
-        std::cout << "Options:" << std::endl
-            << "  -h  print_usage  : " << (opts.print_usage ? "true" : "false") << std::endl
-            << "  -v  verbose      : " << (opts.verbose ? "true" : "false") << std::endl
-            << "  -D  delay_msec   : " << opts.delay_msec << std::endl
-            << "  -l  lines        : " << opts.lines << std::endl
-            << "  -n  num_files    : " << opts.num_files << std::endl
-            << "  -s  num_seconds  : " << opts.num_seconds << std::endl
-            << "  -P  partition    : " << opts.partition << std::endl
-            << "  -p  port         : " << opts.port << std::endl
-            << "  -w  wait_seconds : " << opts.wait_seconds << std::endl
-            << "  -d  base_dir     : " << opts.base_dir << std::endl
-            << "  -t  text_file    : " << opts.text_file << std::endl
+        std::cout << "Options:" << '\n'
+            << "  -h  print_usage  : " << (opts.print_usage ? "true" : "false") << '\n'
+            << "  -v  verbose      : " << (opts.verbose ? "true" : "false") << '\n'
+            << "  -a  address      : " << opts.ip_addr << '\n'
+            << "  -D  delay_msec   : " << opts.delay_msec << '\n'
+            << "  -l  lines        : " << opts.lines << '\n'
+            << "  -n  num_files    : " << opts.num_files << '\n'
+            << "  -s  num_seconds  : " << opts.num_seconds << '\n'
+            << "  -P  partition    : " << opts.partition << '\n'
+            << "  -p  port         : " << opts.port << '\n'
+            << "  -w  wait_seconds : " << opts.wait_seconds << '\n'
+            << "  -d  base_dir     : " << opts.base_dir << '\n'
+            << "  -t  text_file    : " << opts.text_file << '\n'
             << std::endl;
     }
 }
@@ -239,6 +240,7 @@ static void PrintUsage(void)
         "Options:\n"
         "  -h, --help               Print this help message and exit\n"
         "  -v, --verbose            Enable extra messages\n"
+        "  -a, --address IPA        IP Address to connect to (default: 127.0.0.1)\n"
         "  -D, --delay N            Average delay between writes in milliseconds (default: 10)\n"
         "  -l, --lines N            Number of lines to write (default: 0)\n"
         "  -n, --number-of-files N  Number of files to create or socket connections to open (default: 128)\n"

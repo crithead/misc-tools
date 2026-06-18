@@ -20,7 +20,7 @@ static bool _messages_on = false;
 /// * Set nofile (file descriptor) soft limit to hard limit.
 void AdjustLimits(void)
 {
-    struct rlimit rls = {0};
+    struct rlimit rls;
 
     if (getrlimit(RLIMIT_NOFILE, &rls) == -1) {
         throw std::runtime_error("Failed to get resource limit");

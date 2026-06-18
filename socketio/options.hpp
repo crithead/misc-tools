@@ -39,6 +39,7 @@ class Options
     static const size_t MIN_WAIT_SECONDS;
     static const size_t MAX_WAIT_SECONDS;
     static const std::string DEFAULT_BASE_DIR;
+    static const std::string DEFAULT_IP_ADDR;
     static const std::string DEFAULT_TEXT_FILE;
     static const std::string DEFAULT_WAIT_METHOD;
 
@@ -54,6 +55,7 @@ class Options
     size_t port;
     size_t wait_seconds;
     std::string base_dir;
+    std::string ip_addr;
     std::string text_file;
     std::string wait_method;
 };
