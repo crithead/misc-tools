@@ -2,7 +2,7 @@
 
 BIN = bin
 
-all: array nearest-power-of-two poweroftwo series-approx sizeof square-root three-bits
+all: array capalist envp exists format gettime nearest-power-of-two poweroftwo reader series-approx sizeof square-root three-bits
 
 bin:
 	mkdir -p bin
@@ -10,11 +10,29 @@ bin:
 array: array.c | bin
 	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/array array.c -lm
 
+capalist: capalist.c | bin
+	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/capalist capalist.c -lm
+
+envp: envp.c | bin
+	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/envp envp.c -lm
+
+exists: exists.c | bin
+	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/exists exists.c -lm
+
+format: format.c | bin
+	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/format format.c -lm
+
+gettime: gettime.c | bin
+	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/gettime gettime.c -lm
+
 nearest-power-of-two: nearest-power-of-two.c | bin
 	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/nearest-power-of-two nearest-power-of-two.c -lm
 
 poweroftwo: poweroftwo.c | bin
 	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/poweroftwo poweroftwo.c -lm
+
+reader: reader.c | bin
+	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/reader reader.c -lm
 
 series-approx: series-approx.c | bin
 	gcc -Wall -Wpedantic --std=c11 -o $(BIN)/series-approx series-approx.c -lm

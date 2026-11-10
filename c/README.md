@@ -1,4 +1,8 @@
-# Problems
+# Miscellaneous C Programs
+
+Some programming problem solutions, some random experiments in C.
+
+## Problems
 
 A collection of solutions to programming problems.
 

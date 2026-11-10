@@ -28,7 +28,7 @@ static const int POWERS[NUM_NUMS] = {
 	-1, 0, 1, 2, 3, 4
 };
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
 	int i;
 	for (i = 0; i < NUM_NUMS;  i++) {
@@ -38,5 +38,3 @@ int main(int argc, char **argv)
 		std::cout << n << '^' << p << " = " << r << std::endl;
 	}
 }
-
-

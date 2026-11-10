@@ -10,7 +10,7 @@ void auto_type_2( void );
 
 
 
-int main( int argc, char **argv )
+int main( int, char ** )
 {
     auto_type_1();
     auto_type_2();
@@ -60,4 +60,3 @@ void auto_type_2( void )
         std::cout << *it << ' ';
     std::cout << std::endl;
 }
-

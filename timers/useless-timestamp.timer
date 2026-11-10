@@ -1,0 +1,12 @@
+# Install to ~/.config/systemd/user
+
+[Unit]
+Description="Wite a timestamp to a log file every 6 minutes."
+
+[Timer]
+Unit=useless-timestamp.service
+OnCalendar=Mon..Fri *-*-* *:06:00
+WakeSystem=no
+
+[Install]
+WantedBy=timers.target

@@ -81,6 +81,8 @@ cpp/alt-tokens
 cpp/auto
 cpp/bad-macro
 cpp/blobs
+cpp/builder-pattern
+cpp/builder-pattern-v2
 cpp/ch9vector
 cpp/class-ident
 cpp/combat3d
@@ -97,11 +99,13 @@ cpp/enum
 cpp/fibonacci
 cpp/fileio-char
 cpp/fileio-int
+cpp/findif
 cpp/first-unique
+cpp/func-timer
 cpp/functor
 cpp/global-object
-cpp/golden-ratio
 cpp/gnome
+cpp/golden-ratio
 cpp/increment
 cpp/int-except
 cpp/int-types
@@ -109,6 +113,7 @@ cpp/letter-counter
 cpp/list-iterator
 cpp/list-remove
 cpp/loopvars
+cpp/malloc-new
 cpp/markov
 cpp/markov2
 cpp/messagequeue
@@ -120,8 +125,8 @@ cpp/primes
 cpp/pwgen
 cpp/range
 cpp/rawstring
-cpp/readfile
 cpp/read-write
+cpp/readfile
 cpp/redirect
 cpp/replace-with-product
 cpp/retirement
@@ -129,8 +134,9 @@ cpp/ringbuffer
 cpp/robber
 cpp/root
 cpp/rtti
-cpp/std-map
+cpp/sizes
 cpp/static-init
+cpp/std-map
 cpp/string-compare
 cpp/string-wrap
 cpp/strings
@@ -160,5 +166,5 @@ umq/server
 umq/relay
 umq/iclient
 umq/iserver
-epoll/reader
-epoll/writer
+socketio/reader
+socketio/writer

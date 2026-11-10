@@ -11,6 +11,11 @@ static const int ARRAY_LENGTH = 20;
 
 int main(int argc, char **argv)
 {
+	if (argc < 2) {
+		std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
+		return 1;
+	}
+
 	int array[ARRAY_LENGTH];
 	std::string filename(argv[1]);
 
@@ -45,4 +50,3 @@ void init_array(int *array, int length)
 	for (int i = 0; i < length; i++)
 		array[i] = 1000 + (i + 100) * (i % 5);
 }
-

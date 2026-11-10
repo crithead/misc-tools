@@ -16,6 +16,7 @@ public:
     thing(int, std::string &);
     thing(const thing&);
     ~thing();
+    thing& operator=(const thing&);
     const std::string &name(void) const;
     int number(void) const;
 private:
@@ -42,6 +43,13 @@ thing::thing(const thing& that) {
     _name = that.name();
 }
 
+thing& thing::operator=(const thing& that) {
+    std::cout << "thing::operator=(thing&)" << '\n';
+    _number = that.number();
+    _name = that.name();
+    return *this;
+}
+
 thing::~thing() {
     std::cout << "thing::~thing()" << '\n';
 }
@@ -59,7 +67,7 @@ int thing::number(void) const {
 // ----------------------------------------------------------------------------
 
 
-int main(int argc, char *argv[])
+int main(int, char **)
 {
     std::map<int, thing> *things; // map of things key on numbers
     std::string word;        // input buffer for words.
@@ -94,4 +102,3 @@ int main(int argc, char *argv[])
 
     return 0;
 } //end main
-

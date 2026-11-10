@@ -35,9 +35,10 @@ static void demo_string_view(void)
               << std::endl;
 }
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     demo_string_view();
     demo_clamp();
     demo_if_else_initializer();
+    return 0;
 }

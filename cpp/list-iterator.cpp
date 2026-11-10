@@ -51,7 +51,7 @@ void print_or_erase_middle( std::list<int>& lst )
 #endif
 }
 
-int main( int argc, char **argv )
+int main( int, char ** )
 {
     std::list<int> L;
     for (int i = 11; i < 100; i+= 11 )
@@ -62,4 +62,3 @@ int main( int argc, char **argv )
 
     return 0;
 }
-

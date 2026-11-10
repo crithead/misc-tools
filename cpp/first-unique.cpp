@@ -23,7 +23,7 @@ int FirstUnique(int *array, int length)
 }
 
 
-int main (int argc, char *argv[])
+int main (int, char **)
 {
 	int i, a[200];
 	srand(time(0));
@@ -46,4 +46,3 @@ int main (int argc, char *argv[])
 	std::cout << "\n\n\n" << FirstUnique(a, 100) << std::endl;
 	return 0;
 }
-

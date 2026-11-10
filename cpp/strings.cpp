@@ -7,7 +7,7 @@
 
 void default_string( void );
 
-int main( int argc, char** argv )
+int main( int, char** )
 {
     default_string();
 
@@ -27,4 +27,3 @@ void default_string( void )
         std::cerr << "Exception: " << e.what() << std::endl;
     }
 }
-

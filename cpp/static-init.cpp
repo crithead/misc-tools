@@ -66,7 +66,7 @@ public:
         return hexidecimal.size();
     }
     static char hexidecimal_value(size_t index) {
-        assert(0 <= index && index < hexidecimal.size());
+        assert(index < hexidecimal.size());
         return hexidecimal[index];
     }
 private:
@@ -150,4 +150,3 @@ void every_other_upper(bool evens)
     }
     cout << endl;
 }
-

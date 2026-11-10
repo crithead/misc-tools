@@ -10,7 +10,7 @@
 /// @param argc Argument count
 /// @param argv Argument vector
 /// @retval 0 Always
-int main(int argc, char **argv)
+int main(int, char **)
 {
     // Give this instance of A a string
     A *a = new A;
@@ -34,4 +34,3 @@ int main(int argc, char **argv)
     return 0;
 }
 /// @}
-

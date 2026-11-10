@@ -54,7 +54,7 @@ enum B : A {
 };
 #endif
 
-int main( int argc, char **argv )
+int main( int, char ** )
 {
 	cout << "NONE         : " << NONE << endl;
 	cout << "FIRST_ERROR  : " << FIRST_ERROR << endl;

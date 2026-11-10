@@ -4,7 +4,7 @@
 // and evaluated by the handler.
 //
 // Note: In C++11 this behavior is deprecated.
-// GCC says: 
+// GCC says:
 //     warning: dynamic exception specifications are deprecated in C++11
 
 #include <iostream>
@@ -19,7 +19,7 @@ enum IntegerException {
 
 float divide(int x, int y) throw(IntegerException);
 
-int main(int argc, char *argv[])
+int main(int, char **)
 {
     for (int i = -10; i <= +10; i++) {
         try {
@@ -44,4 +44,3 @@ float divide(int x, int y) throw(IntegerException)
         throw DivideByZero;
     return ((float)x / (float)y);
 }
-

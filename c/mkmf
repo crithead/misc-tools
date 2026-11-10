@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Makefile generator for Problems
+# Makefile generator
 #
 MAKEFILE=Makefile
 

@@ -119,7 +119,7 @@ std::ostream& operator<<(std::ostream& os, const Complex& z)
 
 #include <cassert>
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     Complex a;
     assert(a.Re() == 0.0);
@@ -180,4 +180,3 @@ int main(int argc, char **argv)
 #endif // TEST
 
 /// @}
-

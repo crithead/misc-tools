@@ -29,7 +29,7 @@ void use_new_free(void);
 void segv(void);
 
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     signal(SIGSEGV, handle_signal);
     signal(SIGINT, handle_signal);
@@ -142,4 +142,3 @@ void segv(void)
     int *t = nullptr;
     *t = 5;
 }
-

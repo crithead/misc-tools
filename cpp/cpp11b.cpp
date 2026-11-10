@@ -2,7 +2,7 @@
 // GCC: Compile with "-std=c++11 -pthread"
 /*
 This program starts some threads that take an abstract action at random
-(1 to 10) intervals.  Each thread waits on a condition variable for the 
+(1 to 10) intervals.  Each thread waits on a condition variable for the
 turn count to update.  Each time it wakes up, it checks if it is time to
 take its next action.  Each thread exits after taking N actions.
 
@@ -54,7 +54,7 @@ void actor_body( int id )
                 << std::endl;
         while ( next_action > current_turn ) {
             next_turn.wait( lock );
-            std::cout << "Actor #" << id << " checking current turn at " 
+            std::cout << "Actor #" << id << " checking current turn at "
                     << current_turn << std::endl;
         }
         std::cout << "Actor #" << id << " takes action #" << i << " on turn "
@@ -64,7 +64,7 @@ void actor_body( int id )
     num_live_actors--;
 }
 
-int main( int argc, char **argv )
+int main( int, char ** )
 {
     std::vector<std::thread> actors;
 

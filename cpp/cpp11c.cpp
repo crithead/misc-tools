@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-int main( int argc, char **argv )
+int main( int, char ** )
 {
     const int X = 11;
     const int Y = 22;
@@ -17,4 +17,3 @@ int main( int argc, char **argv )
 
     return 0;
 }
-

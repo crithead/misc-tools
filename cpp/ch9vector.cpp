@@ -139,7 +139,7 @@ void Example4(void)
 }
 
 
-int main()
+int main(void)
 {
     Example1();
     Example2();

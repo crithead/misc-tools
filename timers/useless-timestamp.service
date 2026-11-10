@@ -1,0 +1,11 @@
+# Install to ~/.config/systemd/user/
+[Unit]
+Description="Write the time to a log"
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "date >> ~/.local/tmp/timestamp.log"
+
+[Install]
+WantedBy=default.target

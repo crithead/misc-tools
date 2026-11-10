@@ -67,7 +67,7 @@ bool IsAGoose(Bird *b)
 #endif
 }
 
-int main(int argc, char *argv[])
+int main(int, char **)
 {
     Bird *bird = new Bird;
     Duck *duck = new Duck;

@@ -73,7 +73,7 @@ int Two::Y() const
 }
 
 
-int main(int argc, char **argv)
+int main(void)
 {
 	One o1(11, 22);
 	Two t1(111, 222, 333, 444);
@@ -88,4 +88,3 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-

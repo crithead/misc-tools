@@ -21,17 +21,17 @@ private:
     int a;
 };
 
-class Counter 
+class Counter
 {
 public:
-    Counter(int start, int end) : 
+    Counter(int start, int end) :
             m_start(start), m_end(end), m_count(start)
     {
-        std::cout << " Counter(" << m_count << "/" << m_end << ")" 
+        std::cout << " Counter(" << m_count << "/" << m_end << ")"
                 << std::endl;
     }
     ~Counter() {
-        std::cout << "~Counter(" << m_count << "/" << m_end << ")" 
+        std::cout << "~Counter(" << m_count << "/" << m_end << ")"
                 << std::endl;
     }
     int operator++() {
@@ -50,7 +50,7 @@ private:
 };
 
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     std::cout << "Before loop 1." << std::endl;
     for (int i = 0; i < 3; i++) {

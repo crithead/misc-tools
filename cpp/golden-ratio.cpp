@@ -49,14 +49,14 @@ void FibonacciSequence(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-int main (int argc, char * const argv[]) {
+int main (int, char **) {
 
     // detect the number of significant digits in a double
     //    cout << "1/3 = " << setprecision(16)
     //         << ((double)1.0/(double)3.0) << endl;
 
     goldenRatio = CalcGoldenRatio();
-    cout << "Calutaled Golden Ratio = " 
+    cout << "Calutaled Golden Ratio = "
          << setprecision(16)
          << goldenRatio
          << endl;
@@ -65,4 +65,3 @@ int main (int argc, char * const argv[]) {
 
     return 0;
 }
-

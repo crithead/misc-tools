@@ -11,7 +11,7 @@ static void f1( void );
 static void f2( void );
 static void check_change( OutputExpectedTo );
 
-int main( int argc, char **argv )
+int main( int, char ** )
 {
 	f1();
 	f2();
@@ -69,4 +69,3 @@ void f2( void )
 	// a {66};  -- error: expected ‘;’ before ‘{’ token
 	// b (77);  -- error: ‘b’ cannot be used as a function
 }
-

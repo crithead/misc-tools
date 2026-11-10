@@ -32,7 +32,7 @@ private:
     int m_x;
 };
 
-int main( int argc, char** argv )
+int main( int, char** )
 {
     shared_pointer();
     unique_pointer();
@@ -126,4 +126,3 @@ void unique_pointer_array_malloc( void )
         std::cout << ' ' << x[i];
     std::cout << std::endl;
 }
-

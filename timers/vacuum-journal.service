@@ -1,0 +1,10 @@
+[Unit]
+Description="Clean journal logs"
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/journalctl --vacuum-time=7d
+
+[Install]
+WantedBy=default.target

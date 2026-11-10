@@ -1,0 +1,10 @@
+[Unit]
+Description="Periodically clean the journal logs"
+
+[Timer]
+Unit=vacuum-journal.service
+OnCalendar=*-*-* 01:05:00
+WakeSystem=no
+
+[Install]
+WantedBy=timers.target

@@ -111,7 +111,7 @@ struct Organic : public Entity
         health = maxHealth;
     }
 
-    virtual int Action( int state ) {
+    virtual int Action( int /* state */ ) {
         cout << "Action( " << name << " )" << endl;
         return 0;
     }
@@ -415,9 +415,9 @@ void Fight( const Options& opts, Unit& u1, Unit& u2 )
             b = &u1;
         }
         else {
-            cout << "--- turn    " << turn << endl; 
-            cout << "--- u1.turn " << u1.turn << endl; 
-            cout << "--- u2.turn " << u2.turn << endl; 
+            cout << "--- turn    " << turn << endl;
+            cout << "--- u1.turn " << u1.turn << endl;
+            cout << "--- u2.turn " << u2.turn << endl;
         }
 
         // A attacks B
@@ -732,4 +732,3 @@ int main( int argc, char **argv )
     return 0;
 }
 #endif //0
-

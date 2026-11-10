@@ -1,11 +1,11 @@
 // int_types.cpp
-// 
+//
 
 #include <iostream>
 
 void print_sizes(void);
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     int errors = 0;
 
@@ -22,4 +22,3 @@ void print_sizes(void)
     std::cout << "long int\t" << sizeof(long int) << std::endl;
     std::cout << "long long\t" << sizeof(long long) << std::endl;
 }
-

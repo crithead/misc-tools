@@ -100,7 +100,7 @@ static int GoRobbing( std::vector<int>& stash )
 //
 //
 //
-int main( int argc, char **argv )
+int main( int, char ** )
 {
 	std::vector<int> stash( STASH_SIZE );
 	InitStash( stash, STASH_SIZE );
@@ -111,4 +111,3 @@ int main( int argc, char **argv )
 
 	return 0;
 }
-

@@ -44,11 +44,10 @@ int RandInt( int a, int b )
 }
 
 
-int main( int argc, char **argv )
+int main( int, char **)
 {
     const int n = RandInt( 0, NUM_PHRASES - 1 );
     cout << PHRASES[ n ] << endl;
 
     return 0;
 }
-

@@ -4,7 +4,7 @@
 #include <cctype>
 #include <iostream>
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
     char *end;
     int n;

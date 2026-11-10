@@ -154,7 +154,7 @@ int Roll(int n, int s)
 }
 
 // Generate a point in each of the eight radial directions from the center
-void Generate(const options& opts, std::vector<point>& points)
+void Generate(const options&, std::vector<point>& points)
 {
     const int cx = WIDTH / 2;
     const int cy = HEIGHT / 2;

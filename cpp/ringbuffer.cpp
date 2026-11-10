@@ -64,7 +64,7 @@ int ringbuffer::clip(int index) const
 static void report(const ringbuffer& rb);
 
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
 	ringbuffer rb(5);
 
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
 	}
 
 		report(rb);
-	
+
 	return 0;
 }
 
@@ -99,4 +99,3 @@ static void report(const ringbuffer& rb)
 #endif // DEMO
 
 /// @}
-

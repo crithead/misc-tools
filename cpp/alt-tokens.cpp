@@ -11,7 +11,7 @@ using namespace std;
 
 static void c_alternative_tokens( void );
 
-int main( int argc, char **argv )
+int main( int, char ** )
 {
 	cout << __FUNCTION__ << endl;
 
@@ -49,4 +49,3 @@ void c_alternative_tokens( void )
 	// xor ^
 	// xor_eq ^=
 }
-

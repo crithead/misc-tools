@@ -6,7 +6,7 @@
 #include <cstdio>
 #include <ctime>
 
-int main(int argc, char **argv) 
+int main(int, char **)
 {
     std::cout << "This is before reopening stdout as a file." << std::endl;
 
@@ -22,4 +22,3 @@ int main(int argc, char **argv)
     fclose(stdout);
     return 0;
 }
-

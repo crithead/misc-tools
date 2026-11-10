@@ -73,7 +73,7 @@ void remove_value( std::list<thing *>& things, int v )
     }
 }
 
-int main( int argc, char **argv )
+int main( int, char ** )
 {
     list<thing *> things;
 
@@ -110,4 +110,3 @@ int main( int argc, char **argv )
 
     return 0;
 }
-
